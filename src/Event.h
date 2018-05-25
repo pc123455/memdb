@@ -6,27 +6,15 @@
 #define MEMDB_EVENT_H
 
 #include "Connection.h"
+#include "utils/types.h"
 #include <sys/epoll.h>
-#include <set>
-
-using fd_t = int
-
-class Event {
-    //connection
-    Connection* data;
-    //the writeable flag
-    unsigned write;
-    //the readable flag
-    unsigned read;
-    //the acceptable flag
-    unsigned accept;
-};
+#include <vector>
 
 class FDEvents {
     //connection pool
-    std::vector<Connection*> connections;
+    Connection::connection_pool_t connections;
     //ready connections
-    std::vector<Connection*> ready_connections;
+    Connection::connection_pool_t ready_connections;
     //linsten socket
     Socket listen_sock;
     //max fds number

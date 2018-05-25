@@ -5,42 +5,43 @@
 #ifndef MEMDB_CONNECTION_H
 #define MEMDB_CONNECTION_H
 
-#include "Event.h"
+#include "Client.h"
+#include "utils/types.h"
 #include <functional>
 #include <sys/socket.h>
 #include <string>
 #include <vector>
 
-using Socket = int;
-using Byte = u_char;
 
 class Connection {
-    //read event
-    Event read;
-    //write event
-    Event write;
     //socket handle
     Socket fd;
     //send handle
-    std::function<size_t (std::vector<Byte>, size_t)> send_handle;
+    std::function<size_t (std::vector<Byte>&, size_t)> send_handle;
     //recieve handle
-    std::function<size_t (std::vector<Byte>, size_t)> recieve_handle;
+    std::function<size_t (std::vector<Byte>&, size_t)> receive_handle;
     //sent byte count
     size_t sent;
     //client sockaddr structure
-    sockaddr sockaddr;
+    struct sockaddr sockaddr;
     //length of sockaddr
     socklen_t socklen;
     //client ip address
     std::string addr_text;
     //localhost sockaddr structure
-    sockaddr local_sockaddr;
-    //buffer
-    std::vector<Byte> buffer;
+    struct sockaddr local_sockaddr;
     //connection closed flag
-    unsigned close;
+    bool is_close;
 
 public:
+    //connection pool type
+    using connection_pool_t = std::vector<Connection*>;
+
+    //client info
+    Client* client;
+
+    Connection();
+
     ~Connection();
 
     const std::function<size_t(std::vector<Byte>, size_t)> &get_send_handle() const;

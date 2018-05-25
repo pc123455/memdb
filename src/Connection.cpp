@@ -5,22 +5,29 @@
 #include "Connection.h"
 #include <unistd.h>
 
+Connection::Connection(): client(nullptr), fd(0), is_close(1) {
+
+}
+
 Connection::~Connection() {
+    delete client;
     ::close(fd);
 }
 
-const std::function<size_t(std::vector<Byte>, size_t)> &Connection::get_send_handle() const {
-    return send_handle;
-}
+#define REG_PROC(c, f)     net->proc_map.set_proc(#c, f, proc_##c)
 
-void Connection::set_send_handle(const std::function<size_t(std::vector<Byte>, size_t)> &send_handle) {
-    Connection::send_handle = send_handle;
-}
-
-const std::function<size_t(std::vector<Byte>, size_t)> &Connection::get_recieve_handle() const {
-    return recieve_handle;
-}
-
-void Connection::set_recieve_handle(const std::function<size_t(std::vector<Byte>, size_t)> &recieve_handle) {
-    Connection::recieve_handle = recieve_handle;
-}
+//const std::function<size_t(std::vector<Byte>&, size_t)> &Connection::get_send_handle() const {
+//    return send_handle;
+//}
+//
+//void Connection::set_send_handle(const std::function<size_t(std::vector<Byte>&, size_t)> &send_handle) {
+//    this->send_handle = send_handle;
+//}
+//
+//const std::function<size_t(std::vector<Byte>&, size_t)> &Connection::get_recieve_handle() const {
+//    return receive_handle;
+//}
+//
+//void Connection::set_recieve_handle(const std::function<size_t(std::vector<Byte>&, size_t)> &recieve_handle) {
+//    this->receive_handle = recieve_handle;
+//}
