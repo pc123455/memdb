@@ -31,7 +31,7 @@ class Connection {
     //localhost sockaddr structure
     struct sockaddr local_sockaddr;
     //connection closed flag
-    bool is_close;
+    bool closed;
 
 public:
     //connection pool type
@@ -52,6 +52,11 @@ public:
 
     void set_recieve_handle(const std::function<size_t(std::vector<Byte>, size_t)> &recieve_handle);
 
+    inline bool is_close() { return closed; }
+
+    inline void set_close(bool close) {
+        closed = close;
+    }
 };
 
 

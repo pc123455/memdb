@@ -5,7 +5,7 @@
 #include "Connection.h"
 #include <unistd.h>
 
-Connection::Connection(): client(nullptr), fd(0), is_close(1) {
+Connection::Connection(): client(nullptr), fd(0), closed(false) {
 
 }
 
