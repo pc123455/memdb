@@ -52,7 +52,7 @@ public:
     //wait for events
     const std::vector<Connection*> &wait(int32_t timeout);
     //accept a new connection
-    int accept(sockaddr_in& cliaddr, socklen_t& cliaddr_len);
+    int accept(int expire_time, sockaddr_in& cliaddr, socklen_t& cliaddr_len);
 };
 
 
