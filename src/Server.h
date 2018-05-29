@@ -21,6 +21,7 @@ class Server {
     //fd events
     FDEvents event;
 
+    static const int LISTENQ;
 public:
     Server();
 

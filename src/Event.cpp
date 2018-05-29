@@ -4,6 +4,7 @@
 
 #include <unordered_map>
 #include <arpa/inet.h>
+#include <exception>
 #include "Event.h"
 #include "Logger.h"
 
@@ -14,14 +15,19 @@ int FDEvents::EVENT_OUT = 1 << 2;
 int FDEvents::EVENT_HUP = 1 << 3;
 int FDEvents::EVENT_ERR = 1 << 4;
 
+FDEvents::FDEvents(Connection::connection_pool_t &connection_pool): connections(connection_pool) {
+
+}
+
 void FDEvents::initialize(fd_t fd) {
     epollfd = epoll_create(MAX_FDS);
 }
 
 int FDEvents::set(fd_t fd, int32_t flag, int32_t data_num, void *data) {
     epoll_event ev;
+    Connection* conn = connections[fd];
     //if the connection is not exist or the connection is closed
-    bool is_new_connection = (connections[fd] == nullptr) || (connections[fd]->is_close());
+    bool is_new_connection = fd_connection_map.find(fd) == fd_connection_map.end();
     int op_flag = is_new_connection ? EPOLL_CTL_ADD : EPOLL_CTL_MOD;
     if (flag & EVENT_IN) {
         ev.events |= EPOLLIN;
@@ -30,18 +36,13 @@ int FDEvents::set(fd_t fd, int32_t flag, int32_t data_num, void *data) {
         ev.events |= EPOLLOUT;
     }
 
-    //new connection pointer
-    Connection* conn = connections[fd] == nullptr ? new Connection() : connections[fd];
-    connections[fd] = conn;
-    // todo connection对象初始化以及复用
-
-    ev.data.ptr = conn;
+    ev.data.fd = fd;
     int ret = epoll_ctl(epollfd, op_flag, fd, &ev);
     if (ret == -1) {
         return -1;
     }
 
-    conn->set_close(false);
+    //insert fd to the set
     if(is_new_connection) {
         fd_connection_map[fd] = conn;
     }
@@ -72,4 +73,25 @@ int FDEvents::accept(sockaddr_in& cliaddr, socklen_t& cliaddr_len) {
         Logger::info("accept a new client") << inet_ntoa(cliaddr.sin_addr) << cliaddr.sin_port;
         return clifd;
     }
+}
+
+const std::vector<Connection*> FDEvents::wait(int32_t timeout) {
+    ready_connections.clear();
+    int ret = epoll_wait(epollfd, epoll_events, EPOLL_EVENTS, timeout);
+    if (ret > 0) {
+        for(int i = 0; i < ret; i++) {
+            epoll_event& ev = epoll_events[i];
+            fd_t fd = ev.data.fd;
+            //add connection to ready array
+            ready_connections.push_back(fd_connection_map[fd]);
+        }
+    } else if (ret == 0) {
+        //return is equal to 0 means connection timeouts
+        return ready_connections;
+    } else if (ret < 0) {
+        //return is small than 0 mean errors happened
+        //todo epoll error
+        throw new std::runtime_error("epoll error");
+    }
+    return ready_connections;
 }

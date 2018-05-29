@@ -15,10 +15,11 @@ class FDEvents {
     //max fds number
 public:
     static const int MAX_FDS = 8 * 1024;
+    static const int EPOLL_EVENTS = 100;
 
 private:
     //connection pool
-    Connection::connection_pool_t connections;
+    Connection::connection_pool_t& connections;
     //ready connections
     Connection::connection_pool_t ready_connections;
     //linsten socket
@@ -40,6 +41,8 @@ public:
     static int EVENT_ERR;
 
 public:
+    FDEvents(Connection::connection_pool_t &connection_pool);
+    //initialize events
     void initialize(Socket fd);
 
     bool isset(fd_t fd, int32_t flag);
@@ -52,7 +55,7 @@ public:
     //wait for events
     const std::vector<Connection*> &wait(int32_t timeout);
     //accept a new connection
-    int accept(int expire_time, sockaddr_in& cliaddr, socklen_t& cliaddr_len);
+    int accept(sockaddr_in& cliaddr, socklen_t& cliaddr_len);
 };
 
 

@@ -9,13 +9,16 @@
 #include <string.h>
 #include "Logger.h"
 
+
+const int Server::LISTENQ = 5;
+
 Server::Server(): connection_pool(FDEvents::MAX_FDS) {
     
 }
 
 void Server::initialize(std::string ip, uint16_t port) {
     // initialize listen socket
-    Socket listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+    fd_t listen_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (listen_fd == -1) {
         Logger::error("socket error:");
         exit(1);
@@ -29,6 +32,7 @@ void Server::initialize(std::string ip, uint16_t port) {
         Logger::error("bind error");
         exit(1);
     }
+    listen(listen_fd, LISTENQ);
 
     event.initialize(listen_fd);
 }
