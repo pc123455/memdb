@@ -11,6 +11,8 @@
 #include <sys/socket.h>
 #include <string>
 #include <vector>
+#include <cstring>
+#include <netinet/in.h>
 
 
 class Connection {
@@ -57,6 +59,25 @@ public:
     inline void set_close(bool close) {
         closed = close;
     }
+
+    inline void set_clinet_addr(const struct sockaddr* s) {
+        memcpy(&sockaddr, s, sizeof(sockaddr));
+        socklen = sizeof(sockaddr);
+    }
+
+    /**
+     * initialize a connection
+     * @param fd
+     * @param client_addr
+     * @return
+     */
+    int initialize(fd_t fd, const sockaddr_in* client_addr);
+
+    /**
+     * release a conntion
+     * @return
+     */
+    int release();
 };
 
 

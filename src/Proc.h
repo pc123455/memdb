@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <string>
+#include <vector>
 
 using proc_t = std::function<int (std::vector<std::string>, std::vector<std::string>)>;
 

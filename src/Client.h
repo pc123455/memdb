@@ -27,6 +27,8 @@ class Client {
     //last interaction time
     time_t last_interaction_time;
 
+public:
+    Client(const char* name);
 };
 
 

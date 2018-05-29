@@ -5,8 +5,8 @@
 #ifndef MEMDB_SERVER_H
 #define MEMDB_SERVER_H
 
-#include <bits/unordered_map.h>
 #include <unordered_map>
+#include <netinet/in.h>
 #include "Connection.h"
 #include "Proc.h"
 #include "Event.h"
@@ -27,9 +27,13 @@ public:
     ~Server();
 
     //initialize server
-    void initialize();
+    void initialize(std::string ip, uint16_t port);
     //begin to serve
     void serve();
+    //create a new connection
+    int create_connection(fd_t fd, const sockaddr_in* client_addr);
+    //destroy connection
+    int destroy_connection(fd_t fd);
 };
 
 

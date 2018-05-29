@@ -9,8 +9,30 @@ Connection::Connection(): client(nullptr), fd(0), closed(false) {
 
 }
 
+int Connection::initialize(fd_t fd, const sockaddr_in *client_addr) {
+    if (client == nullptr) {
+        //create a client object
+        client = new Client("");
+    }
+    //set the client address
+    set_clinet_addr((const struct sockaddr*)(client_addr));
+    //set close flag to false
+    closed = false;
+}
+
+int Connection::release() {
+    if (client != nullptr) {
+        delete client;
+        client = nullptr;
+    }
+    closed = true;
+}
+
 Connection::~Connection() {
-    delete client;
+    if (client != nullptr) {
+        delete client;
+        client = nullptr;
+    }
     ::close(fd);
 }
 

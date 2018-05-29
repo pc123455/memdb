@@ -6,7 +6,12 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <string.h>
 #include "Logger.h"
+
+Server::Server(): connection_pool(FDEvents::MAX_FDS) {
+    
+}
 
 void Server::initialize(std::string ip, uint16_t port) {
     // initialize listen socket
@@ -26,4 +31,30 @@ void Server::initialize(std::string ip, uint16_t port) {
     }
 
     event.initialize(listen_fd);
+}
+
+int Server::create_connection(fd_t fd, const sockaddr_in* client_addr) {
+    if (fd > FDEvents::MAX_FDS) {
+        Logger::error("too many connetions!");
+        return -1;
+    }
+
+    if (connection_pool[fd] == nullptr) {
+        connection_pool[fd] = new Connection();
+    } else {
+        //the connection is not closed
+        if(!connection_pool[fd]->is_close()) {
+            Logger::error("this connection is opened!");
+            return -1;
+        }
+    }
+
+    connection_pool[fd]->initialize(fd, client_addr);
+
+    return 0;
+}
+
+int Server::destroy_connection(fd_t fd) {
+    connection_pool[fd]->release();
+    return -1;
 }
