@@ -6,6 +6,7 @@
 #define MEMDB_SERVER_H
 
 #include <unordered_map>
+#include <map>
 #include <netinet/in.h>
 #include "Connection.h"
 #include "Proc.h"
@@ -20,8 +21,11 @@ class Server {
     std::unordered_map<std::string, Command> process_fun_map;
     //fd events
     FDEvents event;
+    //timeouts set
+    std::map<time_t, Connection*> expire_time_map;
 
     static const int LISTENQ;
+    static const int MAX_WAIT;
 public:
     Server();
 

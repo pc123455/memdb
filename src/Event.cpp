@@ -75,7 +75,7 @@ int FDEvents::accept(sockaddr_in& cliaddr, socklen_t& cliaddr_len) {
     }
 }
 
-const std::vector<Connection*> FDEvents::wait(int32_t timeout) {
+const Connection::connection_pool_t& FDEvents::wait(time_t timeout) {
     ready_connections.clear();
     int ret = epoll_wait(epollfd, epoll_events, EPOLL_EVENTS, timeout);
     if (ret > 0) {
@@ -90,6 +90,7 @@ const std::vector<Connection*> FDEvents::wait(int32_t timeout) {
         return ready_connections;
     } else if (ret < 0) {
         //return is small than 0 mean errors happened
+        Logger::error("epoll error");
         //todo epoll error
         throw new std::runtime_error("epoll error");
     }

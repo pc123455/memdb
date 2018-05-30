@@ -16,6 +16,12 @@
 
 
 class Connection {
+public:
+
+    static const int FLAG_CLOSE     = 0;
+    static const int FLAG_READ      = 1;
+    static const int FLAG_WRITE     = 1 << 1;
+private:
     //socket handle
     Socket fd;
     //send handle
@@ -35,7 +41,10 @@ class Connection {
     //connection closed flag
     bool closed;
 
+
 public:
+    //connection flags
+    uint32_t flags;
     //connection pool type
     using connection_pool_t = std::vector<Connection*>;
 
@@ -78,6 +87,8 @@ public:
      * @return
      */
     int release();
+
+    int receive();
 };
 
 

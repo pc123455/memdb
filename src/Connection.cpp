@@ -28,6 +28,10 @@ int Connection::release() {
     closed = true;
 }
 
+int Connection::receive() {
+    size_t s = read(fd, )
+}
+
 Connection::~Connection() {
     if (client != nullptr) {
         delete client;
