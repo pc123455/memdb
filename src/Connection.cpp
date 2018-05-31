@@ -3,9 +3,11 @@
 //
 
 #include "Connection.h"
+#include "Logger.h"
 #include <unistd.h>
+#include <errno.h>
 
-Connection::Connection(): client(nullptr), fd(0), closed(false) {
+Connection::Connection(): client(nullptr), fd(0), closed(false), buffer(nullptr), buffer_size(0) {
 
 }
 
@@ -14,13 +16,21 @@ int Connection::initialize(fd_t fd, const sockaddr_in *client_addr) {
         //create a client object
         client = new Client("");
     }
+    if (buffer == nullptr) {
+        //create buffer
+        buffer = new Byte[INITIAL_BUFFER_SIZE];
+        buffer_size = INITIAL_BUFFER_SIZE;
+     }
     //set the client address
     set_clinet_addr((const struct sockaddr*)(client_addr));
     //set close flag to false
     closed = false;
-    //set buffers
-    read_buff = std::vector<Byte>(INITIAL_BUFFER_SIZE);
-    read_buff = std::vector<Byte>(INITIAL_BUFFER_SIZE);
+    //set buffers initial size
+    read_buff.resize(INITIAL_BUFFER_SIZE);
+    write_buff.resize(INITIAL_BUFFER_SIZE);
+    //set read/write current pointer
+    read_cur_pos = read_buff.begin();
+    write_cur_pos = write_buff.begin();
 }
 
 int Connection::release() {
@@ -32,7 +42,26 @@ int Connection::release() {
 }
 
 int Connection::receive() {
-    size_t s = read(fd, )
+    for(;;) {
+        ssize_t n = read(fd, buffer, buffer_size);
+        if (n < 0){
+            if (errno == EAGAIN) {
+                //todo 当前缓冲区已无数据
+                //wait a new read event
+                return STAGE_AGAIN;
+            } else {
+                Logger::error(strerror(errno));
+                return STAGE_ERROR;
+            }
+        } else {
+            //insert data into read buffer
+            read_buff.insert(read_buff.cend(), buffer, buffer + n);
+            if (n < buffer_size) {
+                return STAGE_OK;
+            }
+            continue;
+        }
+    }
 }
 
 Connection::~Connection() {

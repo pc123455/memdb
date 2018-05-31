@@ -48,9 +48,20 @@ private:
     bool closed;
     //read buffer
     std::vector<Byte> read_buff;
+    //read buffer used
+    size_t read_used;
+    //read buffer current position
+    std::vector<Byte>::iterator read_cur_pos;
     //write buffer
     std::vector<Byte> write_buff;
-
+    //write buffer used
+    size_t write_used;
+    //write buffer current position
+    std::vector<Byte>::iterator write_cur_pos;
+    //temp buffer
+    Byte* buffer;
+    //temp buffer size
+    size_t buffer_size;
 
 public:
     //connection flags
@@ -98,7 +109,12 @@ public:
      */
     int release();
 
+    /**
+     * receive data from net
+     * @return
+     */
     int receive();
+
 };
 
 

@@ -87,7 +87,20 @@ void Server::serve() {
             Connection* ready_conn = *conn_it;
             if (!ready_conn->is_close()) {
                 if (ready_conn->flags & Connection::FLAG_READ) {
-                    ready_conn->receive()
+                    int res = ready_conn->receive();
+                    switch (res) {
+                        case Connection::STAGE_OK:
+                            //data read complete, begin the next stage process
+                            //todo 网路数据读取完毕，开始进行下一阶段的处理
+
+                            break;
+                        case Connection::STAGE_AGAIN:
+                            //todo 网络数据尚未全部读取，等待新的数据
+                            //data read not complete, wait new data
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
