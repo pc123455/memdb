@@ -18,6 +18,9 @@ int Connection::initialize(fd_t fd, const sockaddr_in *client_addr) {
     set_clinet_addr((const struct sockaddr*)(client_addr));
     //set close flag to false
     closed = false;
+    //set buffers
+    read_buff = std::vector<Byte>(INITIAL_BUFFER_SIZE);
+    read_buff = std::vector<Byte>(INITIAL_BUFFER_SIZE);
 }
 
 int Connection::release() {

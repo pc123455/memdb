@@ -21,6 +21,12 @@ public:
     static const int FLAG_CLOSE     = 0;
     static const int FLAG_READ      = 1;
     static const int FLAG_WRITE     = 1 << 1;
+
+    static const int STAGE_OK       = 0;
+    static const int STAGE_AGAIN    = 1;
+    static const int STAGE_ERROR    = -1;
+
+    static const int INITIAL_BUFFER_SIZE = 2048;
 private:
     //socket handle
     Socket fd;
@@ -40,6 +46,10 @@ private:
     struct sockaddr local_sockaddr;
     //connection closed flag
     bool closed;
+    //read buffer
+    std::vector<Byte> read_buff;
+    //write buffer
+    std::vector<Byte> write_buff;
 
 
 public:
