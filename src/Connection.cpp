@@ -6,12 +6,14 @@
 #include "Logger.h"
 #include <unistd.h>
 #include <errno.h>
+#include <algorithm>
 
 Connection::Connection(): client(nullptr), fd(0), closed(false), buffer(nullptr), buffer_size(0) {
 
 }
 
-int Connection::initialize(fd_t fd, const sockaddr_in *client_addr) {
+int Connection::initialize(fd_t fd, const sockaddr_in *client_addr, uint32_t flags) {
+    this->fd = fd;
     if (client == nullptr) {
         //create a client object
         client = new Client("");
@@ -20,9 +22,13 @@ int Connection::initialize(fd_t fd, const sockaddr_in *client_addr) {
         //create buffer
         buffer = new Byte[INITIAL_BUFFER_SIZE];
         buffer_size = INITIAL_BUFFER_SIZE;
-     }
-    //set the client address
-    set_clinet_addr((const struct sockaddr*)(client_addr));
+    }
+    if ((flags & FLAG_LISTEN) == 0) {
+         //set the client address
+         set_clinet_addr((const struct sockaddr*)(client_addr));
+    }
+    //set flags
+    this->flags = flags;
     //set close flag to false
     closed = false;
     //set buffers initial size
@@ -31,6 +37,8 @@ int Connection::initialize(fd_t fd, const sockaddr_in *client_addr) {
     //set read/write current pointer
     read_cur_pos = read_buff.begin();
     write_cur_pos = write_buff.begin();
+
+
 }
 
 int Connection::release() {
@@ -57,6 +65,41 @@ int Connection::receive() {
             //insert data into read buffer
             read_buff.insert(read_buff.cend(), buffer, buffer + n);
             if (n < buffer_size) {
+                return STAGE_OK;
+            }
+            continue;
+        }
+    }
+}
+
+int Connection::send() {
+    write_buff[0] = '+';
+    write_buff[0] = 'O';
+    write_buff[0] = 'K';
+    write_buff[0] = '\r';
+    write_buff[0] = '\n';
+
+    for (;;) {
+        ssize_t n = std::min<ssize_t>(write_buff.end() - write_cur_pos, buffer_size);
+        if (n < 0) {
+            Logger::error("write buffer pointer error");
+            return STAGE_ERROR;
+        } else if (n == 0) {
+            return STAGE_OK;
+        }
+        std::copy_n(write_cur_pos, n, buffer);
+        ssize_t res = write(fd, buffer, n);
+        if (res < 0) {
+            if (errno == EAGAIN) {
+                return STAGE_AGAIN;
+            } else {
+                Logger::error(strerror(errno));
+                return STAGE_ERROR;
+            }
+        } else {
+            //copy data to send buffer
+            write_cur_pos += res;
+            if (write_cur_pos == write_buff.end()) {
                 return STAGE_OK;
             }
             continue;

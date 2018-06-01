@@ -7,11 +7,12 @@
 
 
 #include <vector>
+#include <string>
 #include "utils/types.h"
 
 class ProtocolParser {
     //decode redis command from raw data
-    static int decode(std::vector<Byte>& raw, std::vector<Byte>& production);
+    static int decode(std::vector<Byte>& raw, std::vector<std::string>& prosduction);
     //encode data to net data
     static int encode(std::vector<std::string> data, std::vector<Byte>& encoded);
 };

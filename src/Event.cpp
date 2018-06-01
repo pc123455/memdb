@@ -69,6 +69,7 @@ int FDEvents::accept(sockaddr_in& cliaddr, socklen_t& cliaddr_len) {
     int clifd = ::accept(listen_sock, (sockaddr*)&cliaddr, &cliaddr_len);
     if (clifd == -1) {
         Logger::error("accept error");
+        Logger::error(strerror(errno));
     } else {
         Logger::info("accept a new client") << inet_ntoa(cliaddr.sin_addr) << cliaddr.sin_port;
         return clifd;

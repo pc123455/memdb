@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include "Logger.h"
+#include "Server.h"
 
 #define EPOLLEVENTS 100
 #define MAXSIZE     1024
@@ -123,11 +124,14 @@ void do_epoll (int listenfd) {
 }
 
 int main() {
-    int listenfd;
-    Logger::init();
-    Logger::info("start service") << "127.0.0.1:" << 8088;
-    listenfd = socket_bind("127.0.0.1", 8888);
-    listen(listenfd, LISTENQ);
-    do_epoll(listenfd);
+//    int listenfd;
+//    Logger::init();
+//    Logger::info("start service") << "127.0.0.1:" << 8088;
+//    listenfd = socket_bind("127.0.0.1", 8888);
+//    listen(listenfd, LISTENQ);
+//    do_epoll(listenfd);
+    Server server;
+    server.initialize("0.0.0.0", 8888);
+    server.serve();
     return 0;
 }

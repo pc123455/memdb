@@ -19,8 +19,9 @@ class Connection {
 public:
 
     static const int FLAG_CLOSE     = 0;
-    static const int FLAG_READ      = 1;
-    static const int FLAG_WRITE     = 1 << 1;
+    static const int FLAG_LISTEN    = 1;
+    static const int FLAG_READ      = (1 << 1);
+    static const int FLAG_WRITE     = (1 << 2);
 
     static const int STAGE_OK       = 0;
     static const int STAGE_AGAIN    = 1;
@@ -90,6 +91,8 @@ public:
         closed = close;
     }
 
+    inline bool is_listen() { return (flags & FLAG_LISTEN) != 0; }
+
     inline void set_clinet_addr(const struct sockaddr* s) {
         memcpy(&sockaddr, s, sizeof(sockaddr));
         socklen = sizeof(sockaddr);
@@ -101,7 +104,7 @@ public:
      * @param client_addr
      * @return
      */
-    int initialize(fd_t fd, const sockaddr_in* client_addr);
+    int initialize(fd_t fd, const sockaddr_in* client_addr, uint32_t flags);
 
     /**
      * release a conntion
@@ -114,6 +117,12 @@ public:
      * @return
      */
     int receive();
+
+    /**
+     * send data from buffer
+     * @return
+     */
+    int send();
 
 };
 

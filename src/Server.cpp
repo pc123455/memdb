@@ -18,6 +18,8 @@ Server::Server(): connection_pool(FDEvents::MAX_FDS), event(connection_pool) {
     
 }
 
+Server::~Server() {}
+
 void Server::initialize(std::string ip, uint16_t port) {
     // initialize listen socket
     fd_t listen_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -37,6 +39,11 @@ void Server::initialize(std::string ip, uint16_t port) {
     listen(listen_fd, LISTENQ);
 
     event.initialize(listen_fd);
+    //
+    connection_pool[listen_fd] = new Connection();
+    connection_pool[listen_fd]->initialize(listen_fd, nullptr, Connection::FLAG_LISTEN);
+    //add listen fd to epoll
+    event.set(listen_fd, FDEvents::EVENT_IN, 0, nullptr);
 }
 
 int Server::create_connection(fd_t fd, const sockaddr_in* client_addr) {
@@ -55,7 +62,7 @@ int Server::create_connection(fd_t fd, const sockaddr_in* client_addr) {
         }
     }
 
-    connection_pool[fd]->initialize(fd, client_addr);
+    connection_pool[fd]->initialize(fd, client_addr, Connection::FLAG_READ | Connection::FLAG_WRITE);
 
     return 0;
 }
@@ -85,14 +92,24 @@ void Server::serve() {
         //process connections
         for (auto conn_it = reday_connections.begin(); conn_it != reday_connections.end(); conn_it++) {
             Connection* ready_conn = *conn_it;
+            //accept the new connection
+            if (ready_conn->is_listen()) {
+                sockaddr_in client_addr;
+                socklen_t addr_len;
+                fd_t client_fd;
+                while ((client_fd = event.accept(client_addr, addr_len)) != -1) {
+                    create_connection(client_fd, &client_addr);
+                }
+                continue;
+            }
             if (!ready_conn->is_close()) {
                 if (ready_conn->flags & Connection::FLAG_READ) {
                     int res = ready_conn->receive();
                     switch (res) {
                         case Connection::STAGE_OK:
                             //data read complete, begin the next stage process
-                            //todo 网路数据读取完毕，开始进行下一阶段的处理
-
+                            //todo 网络数据读取完毕，开始进行下一阶段的处理
+                            ready_conn->send();
                             break;
                         case Connection::STAGE_AGAIN:
                             //todo 网络数据尚未全部读取，等待新的数据
