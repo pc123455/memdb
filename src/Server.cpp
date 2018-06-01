@@ -9,6 +9,7 @@
 #include <string.h>
 #include "Logger.h"
 #include <algorithm>
+#include <sys/fcntl.h>
 #include "Connection.h"
 
 const int Server::LISTENQ = 5;
@@ -27,6 +28,10 @@ void Server::initialize(std::string ip, uint16_t port) {
         Logger::error("socket error:");
         exit(1);
     }
+    //set socket as non-blocking
+    int flags = fcntl(listen_fd, F_GETFL, 0);
+    fcntl(listen_fd, F_SETFL, flags | O_NONBLOCK);
+
     bzero(&server_addr, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     inet_pton(AF_INET, ip.c_str(), &server_addr.sin_addr);
@@ -97,8 +102,13 @@ void Server::serve() {
                 sockaddr_in client_addr;
                 socklen_t addr_len;
                 fd_t client_fd;
-                while ((client_fd = event.accept(client_addr, addr_len)) != -1) {
-                    create_connection(client_fd, &client_addr);
+                while(true) {
+                    client_fd = event.accept(client_addr, addr_len);
+                    if (client_fd != -1) {
+                        create_connection(client_fd, &client_addr);
+                    } else {
+                        break;
+                    }
                 }
                 continue;
             }

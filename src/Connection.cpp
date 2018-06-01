@@ -61,13 +61,16 @@ int Connection::receive() {
                 Logger::error(strerror(errno));
                 return STAGE_ERROR;
             }
-        } else {
+        } else if (n > 0) {
             //insert data into read buffer
             read_buff.insert(read_buff.cend(), buffer, buffer + n);
             if (n < buffer_size) {
                 return STAGE_OK;
             }
             continue;
+        } else {
+            // n equals to 0 means file is end
+            return STAGE_OK;
         }
     }
 }
