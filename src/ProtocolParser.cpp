@@ -16,7 +16,7 @@ int ProtocolParser::decode(const std::vector<Byte>& raw, std::vector<std::string
     }
 
     //validate the raw data format
-    auto it = raw.begin();
+    data_const_iterator_t it = raw.begin();
     if (*it != '*') {
         Logger::error("data is invalid");
         return INVALID_REQUEST;
@@ -24,11 +24,38 @@ int ProtocolParser::decode(const std::vector<Byte>& raw, std::vector<std::string
     it++;
 
     //parse the args count
-    auto count_begin = it;
-    while (it != raw.end() && *it >= '0' && *it <= '9') {
-        it++;
+    int count = parse_num(it, raw.end());
+    if (count < 0) {
+        Logger::error("data is invalid, args num is 0!");
+        return INVALID_REQUEST;
     }
-    atoi()
+    //validate end of line
+    if (!validate_end_line(it, raw.end())) {
+        Logger::error("data is invalid, end line isn't \\r\\n!");
+        return INVALID_REQUEST;
+    }
+
+    for (int i = 0; i < count; i++) {
+        //validate iterator is valid
+        if (it == raw.end()) {
+            Logger::error("data is invalid, params count error!");
+            return INVALID_REQUEST;
+        }
+        if (*it != '$') {
+            Logger::error("data is invalid, bulk strings begin without $!");
+            return INVALID_REQUEST;
+        }
+        it++;
+
+        //parse thr bulk string length
+        int len = parse_num(it, raw.end());
+        if (!validate_end_line(it, raw.end())) {
+            Logger::error("data is invalid, end line isn't \\r\\n!");
+            return INVALID_REQUEST;
+        }
+
+
+    }
 
             //simple string
             if(data_len < 3 || !is_end_valid(raw)) {
