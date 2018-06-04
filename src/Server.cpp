@@ -101,9 +101,8 @@ void Server::serve() {
             if (ready_conn->is_listen()) {
                 sockaddr_in client_addr;
                 socklen_t addr_len;
-                fd_t client_fd;
                 while(true) {
-                    client_fd = event.accept(client_addr, addr_len);
+                    fd_t client_fd = event.accept(client_addr, addr_len);
                     if (client_fd != -1) {
                         create_connection(client_fd, &client_addr);
                         event.set(client_fd, FDEvents::EVENT_IN, 0, nullptr);

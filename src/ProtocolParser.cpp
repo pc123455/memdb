@@ -12,14 +12,14 @@ int ProtocolParser::decode(const std::vector<Byte>& raw, std::vector<std::string
     if (data_len < 4) {
         //the minimum valid request *0\r\n
         Logger::error("data is null");
-        return INVALID_REQUEST;
+        return PARSE_INVALID_REQUEST;
     }
 
     //validate the raw data format
     data_const_iterator_t it = raw.begin();
     if (*it != '*') {
         Logger::error("data is invalid");
-        return INVALID_REQUEST;
+        return PARSE_INVALID_REQUEST;
     }
     it++;
 
@@ -27,45 +27,47 @@ int ProtocolParser::decode(const std::vector<Byte>& raw, std::vector<std::string
     int count = parse_num(it, raw.end());
     if (count < 0) {
         Logger::error("data is invalid, args num is 0!");
-        return INVALID_REQUEST;
+        return PARSE_INVALID_REQUEST;
     }
     //validate end of line
     if (!validate_end_line(it, raw.end())) {
         Logger::error("data is invalid, end line isn't \\r\\n!");
-        return INVALID_REQUEST;
+        return PARSE_INVALID_REQUEST;
     }
 
     for (int i = 0; i < count; i++) {
         //validate iterator is valid
         if (it == raw.end()) {
             Logger::error("data is invalid, params count error!");
-            return INVALID_REQUEST;
+            return PARSE_INVALID_REQUEST;
         }
         if (*it != '$') {
             Logger::error("data is invalid, bulk strings begin without $!");
-            return INVALID_REQUEST;
+            return PARSE_INVALID_REQUEST;
         }
         it++;
 
         //parse thr bulk string length
         int len = parse_num(it, raw.end());
+        if (len <= 0) {
+            Logger::error("data is invalid, bulk string length is 0 or smaller than 0");
+            return PARSE_INVALID_REQUEST;
+        }
         if (!validate_end_line(it, raw.end())) {
             Logger::error("data is invalid, end line isn't \\r\\n!");
-            return INVALID_REQUEST;
+            return PARSE_INVALID_REQUEST;
         }
 
-
+        //parse the bulk string
+        std::string str;
+        if (parse_bulk_string(it, raw.end(), len, str) == -1) {
+            Logger::error("data is invalid, bulk string invalid");
+            return PARSE_INVALID_REQUEST;
+        }
+        production.push_back(str);
     }
 
-            //simple string
-            if(data_len < 3 || !is_end_valid(raw)) {
-                //length of "+\r\n" is 3
-                Logger::error("data is invalid");
-                return -1;
-            }
-
-            std::string str(raw.begin() + 1, raw.end() - 2);
-            production.push_back(str);
-            return 0;
-
+    return PARSE_OK;
 }
+
+int ProtocolParser::encode(std::vector<std::string> &data, std::vector<Byte> &encoded) {}
