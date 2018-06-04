@@ -32,8 +32,8 @@ int Connection::initialize(fd_t fd, const sockaddr_in *client_addr, uint32_t fla
     //set close flag to false
     closed = false;
     //set buffers initial size
-    read_buff.resize(INITIAL_BUFFER_SIZE);
-    write_buff.resize(INITIAL_BUFFER_SIZE);
+    read_buff.reserve(INITIAL_BUFFER_SIZE);
+    write_buff.reserve(INITIAL_BUFFER_SIZE);
     //set read/write current pointer
     read_cur_pos = read_buff.begin();
     write_cur_pos = write_buff.begin();
@@ -63,7 +63,7 @@ int Connection::receive() {
             }
         } else if (n > 0) {
             //insert data into read buffer
-            read_buff.insert(read_buff.cend(), buffer, buffer + n);
+            read_buff.insert(read_buff.end(), buffer, buffer + n);
             if (n < buffer_size) {
                 return STAGE_OK;
             }
@@ -76,11 +76,11 @@ int Connection::receive() {
 }
 
 int Connection::send() {
-    write_buff[0] = '+';
-    write_buff[0] = 'O';
-    write_buff[0] = 'K';
-    write_buff[0] = '\r';
-    write_buff[0] = '\n';
+    write_buff.push_back('+');
+    write_buff.push_back('O');
+    write_buff.push_back('K');
+    write_buff.push_back('\r');
+    write_buff.push_back('\n');
 
     for (;;) {
         ssize_t n = std::min<ssize_t>(write_buff.end() - write_cur_pos, buffer_size);
@@ -108,6 +108,10 @@ int Connection::send() {
             continue;
         }
     }
+}
+
+int Connection::get_fd() {
+    return fd;
 }
 
 Connection::~Connection() {

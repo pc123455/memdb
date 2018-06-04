@@ -27,10 +27,10 @@ public:
     static const int STAGE_AGAIN    = 1;
     static const int STAGE_ERROR    = -1;
 
-    static const int INITIAL_BUFFER_SIZE = 2048;
+    static const int INITIAL_BUFFER_SIZE = 10;
 private:
     //socket handle
-    Socket fd;
+    fd_t fd;
     //send handle
     std::function<size_t (std::vector<Byte>&, size_t)> send_handle;
     //recieve handle
@@ -124,6 +124,7 @@ public:
      */
     int send();
 
+    fd_t get_fd();
 };
 
 

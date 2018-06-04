@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <arpa/inet.h>
 #include <exception>
+#include <sys/fcntl.h>
 #include "Event.h"
 #include "Logger.h"
 
@@ -21,6 +22,7 @@ FDEvents::FDEvents(Connection::connection_pool_t &connection_pool): connections(
 
 void FDEvents::initialize(fd_t fd) {
     epollfd = epoll_create(MAX_FDS);
+    listen_sock = fd;
 }
 
 int FDEvents::set(fd_t fd, int32_t flag, int32_t data_num, void *data) {
@@ -72,8 +74,11 @@ int FDEvents::accept(sockaddr_in& cliaddr, socklen_t& cliaddr_len) {
         Logger::error(strerror(errno));
     } else {
         Logger::info("accept a new client") << inet_ntoa(cliaddr.sin_addr) << cliaddr.sin_port;
-        return clifd;
+        //set socket as non-blocking
+        int flags = fcntl(clifd, F_GETFL, 0);
+        fcntl(clifd, F_SETFL, flags | O_NONBLOCK);
     }
+    return clifd;
 }
 
 const Connection::connection_pool_t& FDEvents::wait(time_t timeout) {
@@ -96,4 +101,8 @@ const Connection::connection_pool_t& FDEvents::wait(time_t timeout) {
         throw new std::runtime_error("epoll error");
     }
     return ready_connections;
+}
+
+int FDEvents::reset_ready_conncetions() {
+    ready_connections.clear();
 }

@@ -59,7 +59,7 @@ public:
         return true;
     }
 
-    static inline string
+//    static inline string
 };
 
 

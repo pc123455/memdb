@@ -106,6 +106,7 @@ void Server::serve() {
                     client_fd = event.accept(client_addr, addr_len);
                     if (client_fd != -1) {
                         create_connection(client_fd, &client_addr);
+                        event.set(client_fd, FDEvents::EVENT_IN, 0, nullptr);
                     } else {
                         break;
                     }
@@ -124,6 +125,7 @@ void Server::serve() {
                         case Connection::STAGE_AGAIN:
                             //todo 网络数据尚未全部读取，等待新的数据
                             //data read not complete, wait new data
+                            event.set(ready_conn->get_fd(), FDEvents::EVENT_IN, 0, nullptr);
                             break;
                         default:
                             break;
@@ -131,6 +133,7 @@ void Server::serve() {
                 }
             }
         }
+        event.reset_ready_conncetions();
     }
 
 }

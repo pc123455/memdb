@@ -56,6 +56,8 @@ public:
     const Connection::connection_pool_t& wait(time_t timeout);
     //accept a new connection
     int accept(sockaddr_in& cliaddr, socklen_t& cliaddr_len);
+    //reset the ready connection pool
+    int reset_ready_conncetions();
 };
 
 

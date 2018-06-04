@@ -65,7 +65,7 @@ int ProtocolParser::decode(const std::vector<Byte>& raw, std::vector<std::string
             }
 
             std::string str(raw.begin() + 1, raw.end() - 2);
-            prosduction.push_back(str);
+            production.push_back(str);
             return 0;
 
 }
