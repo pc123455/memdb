@@ -114,6 +114,16 @@ int Connection::get_fd() {
     return fd;
 }
 
+void Connection::clear_read_buffer() {
+    read_buff.clear();
+    read_cur_pos = read_buff.begin();
+}
+
+void Connection::clear_write_buffer() {
+    write_buff.clear();
+    write_cur_pos = write_buff.begin();
+}
+
 Connection::~Connection() {
     if (client != nullptr) {
         delete client;

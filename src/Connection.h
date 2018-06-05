@@ -98,6 +98,10 @@ public:
         socklen = sizeof(sockaddr);
     }
 
+    void clear_read_buffer();
+
+    void clear_write_buffer();
+
     /**
      * initialize a connection
      * @param fd

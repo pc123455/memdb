@@ -83,7 +83,7 @@ void Server::serve() {
         time_t wait_time = expire_it == expire_time_map.end() ? MAX_WAIT : expire_it->first - time(NULL);
         wait_time = std::max<time_t>(wait_time, 0);
 
-        const Connection::connection_pool_t& reday_connections = event.wait(wait_time);
+        const Connection::connection_pool_t& ready_connections = event.wait(wait_time);
 
         //process timeouts connections
         time_t cur_time = time(NULL);
@@ -95,7 +95,7 @@ void Server::serve() {
         }
 
         //process connections
-        for (auto conn_it = reday_connections.begin(); conn_it != reday_connections.end(); conn_it++) {
+        for (auto conn_it = ready_connections.begin(); conn_it != ready_connections.end(); conn_it++) {
             Connection* ready_conn = *conn_it;
             //accept the new connection
             if (ready_conn->is_listen()) {
@@ -125,6 +125,22 @@ void Server::serve() {
                             //todo 网络数据尚未全部读取，等待新的数据
                             //data read not complete, wait new data
                             event.set(ready_conn->get_fd(), FDEvents::EVENT_IN, 0, nullptr);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (ready_conn->flags & Connection::FLAG_WRITE) {
+                    int res = ready_conn->send();
+                    switch (res) {
+                        case Connection::STAGE_OK:
+                            event.set(ready_conn->get_fd(), FDEvents::EVENT_IN, 0, nullptr);
+                            //if all data is sent, the write buffer will be cleared.
+                            ready_conn->clear_write_buffer();
+                            ready_conn->flags &= ~Connection::FLAG_WRITE;
+                            break;
+                        case Connection::STAGE_AGAIN:
+                            event.set(ready_conn->get_fd(), FDEvents::EVENT_IN | FDEvents::EVENT_OUT, 0, nullptr);
                             break;
                         default:
                             break;
