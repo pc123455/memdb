@@ -11,17 +11,25 @@
 #include <algorithm>
 #include <sys/fcntl.h>
 #include "Connection.h"
+#include "db/LevelDbEngine.h"
 
 const int Server::LISTENQ = 5;
 const int Server::MAX_WAIT = 100;
 
-Server::Server(): connection_pool(FDEvents::MAX_FDS), event(connection_pool) {
+Server::Server(): connection_pool(FDEvents::MAX_FDS), event(connection_pool), dbEngine(nullptr) {
     
 }
 
 Server::~Server() {}
 
 void Server::initialize(std::string ip, uint16_t port) {
+    //db initialize
+    dbEngine = new LevelDbEngine();
+    int res = dbEngine->initialize();
+    if (res != DbEngine::DB_OK) {
+        Logger::error("db initialize error!");
+        exit(1);
+    }
     // initialize listen socket
     fd_t listen_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (listen_fd == -1) {
@@ -119,7 +127,11 @@ void Server::serve() {
                         case Connection::STAGE_OK:
                             //data read complete, begin the next stage process
                             //todo 网络数据读取完毕，开始进行下一阶段的处理
-                            ready_conn->send();
+                            int res = proc.process(ready_conn, dbEngine);
+                            if (res == Proc::PROCESS_OK) {
+
+                            }
+//                            ready_conn->send();
                             break;
                         case Connection::STAGE_AGAIN:
                             //todo 网络数据尚未全部读取，等待新的数据

@@ -8,8 +8,11 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include "db/DbEngine.h"
+#include "Connection.h"
 
-using proc_t = std::function<int (std::vector<std::string>, std::vector<std::string>)>;
+using proc_t = std::function<int (DbEngine* db, std::vector<std::string>, std::vector<std::string>)>;
 
 class Command {
     static const int FLAG_READ      = (1 << 0);
@@ -26,10 +29,19 @@ class Command {
     u_int64_t calls;
 
     Command(): name(), flags(0), proc(nullptr), calls(0) {}
+
+public:
+    int operator()(DbEngine* db, std::vector<std::string>& request, std::vector<std::string>& response);
 };
 
 class Proc {
+    std::unordered_map<std::string, Command> proc_map;
 
+public:
+    static const int PROCESS_OK = 0;
+    static const int PROCESS_ERROR = -1;
+
+    int process(Connection* conn, DbEngine* db);
 };
 
 

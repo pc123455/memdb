@@ -119,6 +119,14 @@ void Connection::clear_read_buffer() {
     read_cur_pos = read_buff.begin();
 }
 
+const std::vector<Byte>& Connection::get_read_buffer() const {
+    return read_buff;
+}
+
+int Connection::set_write_buffer(std::vector<Byte> &buff) {
+    write_buff = buff;
+}
+
 void Connection::clear_write_buffer() {
     write_buff.clear();
     write_cur_pos = write_buff.begin();

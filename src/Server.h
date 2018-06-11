@@ -11,6 +11,7 @@
 #include "Connection.h"
 #include "Proc.h"
 #include "Event.h"
+#include "db/DbEngine.h"
 
 class Server {
     //server address structure
@@ -23,6 +24,10 @@ class Server {
     FDEvents event;
     //timeouts set
     std::map<time_t, Connection*> expire_time_map;
+    //db engine
+    DbEngine* dbEngine;
+    //process schedualer
+    Proc proc;
 
     static const int LISTENQ;
     static const int MAX_WAIT;

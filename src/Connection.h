@@ -102,6 +102,10 @@ public:
 
     void clear_write_buffer();
 
+    const std::vector<Byte>& get_read_buffer() const;
+
+    int set_write_buffer(std::vector<Byte>& buff);
+
     /**
      * initialize a connection
      * @param fd
