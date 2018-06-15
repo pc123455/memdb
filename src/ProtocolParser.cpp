@@ -74,5 +74,8 @@ int ProtocolParser::encode(std::vector<std::string> &data, std::vector<Byte> &en
     encoded.reserve(1024);
     std::string len_str = "$" + std::to_string(data.size()) + "\r\n";
     encoded.insert(encoded.end(), len_str.begin(), len_str.end());
-    for(auto it = )
+    for(auto it = data.begin(); it != data.end(); it++) {
+        encoded.insert(encoded.end(), it->begin(), it->end());
+    }
+    return 0;
 }

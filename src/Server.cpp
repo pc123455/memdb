@@ -127,7 +127,7 @@ void Server::serve() {
                         case Connection::STAGE_OK:
                             //data read complete, begin the next stage process
                             //todo 网络数据读取完毕，开始进行下一阶段的处理
-                            int res = proc.process(ready_conn, dbEngine);
+                            res = proc.process(ready_conn, dbEngine);
                             if (res == Proc::PROCESS_OK) {
 
                             }

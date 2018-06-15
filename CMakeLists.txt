@@ -7,4 +7,5 @@ add_executable(memdb src/main.cpp src/Logger.cpp src/Logger.h src/Event.cpp src/
 
 link_directories(/usr/local/lib)
 include_directories(/Users/xueweiyao/Documents/Clionprojects/leveldb/include)
+include_directories(/home/python/CLionProjects/leveldb/include)
 target_link_libraries(memdb libglog.a pthread)

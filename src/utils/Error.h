@@ -9,8 +9,8 @@
 
 class Error {
 public:
-    static const std::string INVALID_COMMOND = "-invalid commond\r\n";
+    static const std::string INVALID_COMMAND;
 };
 
-
+const std::string Error::INVALID_COMMAND = "-invalid commond\r\n";
 #endif //MEMDB_ERROR_H

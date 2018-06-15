@@ -27,7 +27,7 @@ int Proc::process(Connection *conn, DbEngine* db) {
     auto proc_it = proc_map.find(request[0]);
 
     if (proc_it == proc_map.end()) {
-        response.push_back(Error::INVALID_COMMOND);
+        response.push_back(Error::INVALID_COMMAND);
         return PROCESS_OK;
     }
 
@@ -37,5 +37,5 @@ int Proc::process(Connection *conn, DbEngine* db) {
         return PROCESS_ERROR;
     }
 
-    conn->set_write_buffer()
+    //conn->set_write_buffer()
 }
