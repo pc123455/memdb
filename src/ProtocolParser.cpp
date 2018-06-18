@@ -70,7 +70,7 @@ int ProtocolParser::decode(const std::vector<Byte>& raw, std::vector<std::string
     return PARSE_OK;
 }
 
-int ProtocolParser::encode(std::vector<std::string> &data, std::vector<Byte> &encoded) {
+int ProtocolParser::encode(const std::vector<std::string> &data, std::vector<Byte> &encoded) {
     encoded.reserve(1024);
     std::string len_str = "$" + std::to_string(data.size()) + "\r\n";
     encoded.insert(encoded.end(), len_str.begin(), len_str.end());

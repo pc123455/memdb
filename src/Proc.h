@@ -28,7 +28,13 @@ class Command {
     proc_t proc;
     u_int64_t calls;
 
+public:
     Command(): name(), flags(0), proc(nullptr), calls(0) {}
+
+    int initialize(const std::string& name, proc_t proc_fun) {
+        this->name = name;
+        this->proc = proc_fun;
+    }
 
 public:
     int operator()(DbEngine* db, std::vector<std::string>& request, std::vector<std::string>& response);
@@ -42,6 +48,8 @@ public:
     static const int PROCESS_ERROR = -1;
 
     int process(Connection* conn, DbEngine* db);
+
+    int set_process(const std::string& command, proc_t proc_fun);
 };
 
 

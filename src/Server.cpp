@@ -23,6 +23,7 @@ Server::Server(): connection_pool(FDEvents::MAX_FDS), event(connection_pool), db
 Server::~Server() {}
 
 void Server::initialize(std::string ip, uint16_t port) {
+    /**************************network initialize***********************/
     //db initialize
     dbEngine = new LevelDbEngine();
     int res = dbEngine->initialize();
@@ -57,6 +58,9 @@ void Server::initialize(std::string ip, uint16_t port) {
     connection_pool[listen_fd]->initialize(listen_fd, nullptr, Connection::FLAG_LISTEN);
     //add listen fd to epoll
     event.set(listen_fd, FDEvents::EVENT_IN, 0, nullptr);
+
+    /*****************************process initialize*********************/
+    proc.set_process()
 }
 
 int Server::create_connection(fd_t fd, const sockaddr_in* client_addr) {
@@ -129,7 +133,9 @@ void Server::serve() {
                             //todo 网络数据读取完毕，开始进行下一阶段的处理
                             res = proc.process(ready_conn, dbEngine);
                             if (res == Proc::PROCESS_OK) {
-
+                                //after process, set the write event
+                                ready_conn->flags |= Connection::FLAG_WRITE;
+                                event.set(ready_conn->get_fd(), FDEvents::EVENT_OUT, 0, nullptr);
                             }
 //                            ready_conn->send();
                             break;

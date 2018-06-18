@@ -22,7 +22,7 @@ public:
     //decode redis command from raw data
     static int decode(const std::vector<Byte>& raw, std::vector<std::string>& production);
     //encode data to net data
-    static int encode(std::vector<std::string>& data, std::vector<Byte>& encoded);
+    static int encode(const std::vector<std::string>& data, std::vector<Byte>& encoded);
 
     static inline bool is_end_valid(const std::vector<Byte>& data) {
         size_t len = data.size();

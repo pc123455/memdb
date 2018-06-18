@@ -76,11 +76,11 @@ int Connection::receive() {
 }
 
 int Connection::send() {
-    write_buff.push_back('+');
-    write_buff.push_back('O');
-    write_buff.push_back('K');
-    write_buff.push_back('\r');
-    write_buff.push_back('\n');
+//    write_buff.push_back('+');
+//    write_buff.push_back('O');
+//    write_buff.push_back('K');
+//    write_buff.push_back('\r');
+//    write_buff.push_back('\n');
 
     for (;;) {
         ssize_t n = std::min<ssize_t>(write_buff.end() - write_cur_pos, buffer_size);
@@ -121,6 +121,10 @@ void Connection::clear_read_buffer() {
 
 const std::vector<Byte>& Connection::get_read_buffer() const {
     return read_buff;
+}
+
+std::vector<Byte>& Connection::get_write_buffer() {
+    return write_buff;
 }
 
 int Connection::set_write_buffer(std::vector<Byte> &buff) {

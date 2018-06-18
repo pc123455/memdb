@@ -106,6 +106,8 @@ public:
 
     int set_write_buffer(std::vector<Byte>& buff);
 
+    std::vector<Byte>& get_write_buffer();
+
     /**
      * initialize a connection
      * @param fd
