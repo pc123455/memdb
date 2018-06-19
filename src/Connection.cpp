@@ -144,7 +144,7 @@ Connection::~Connection() {
     ::close(fd);
 }
 
-#define REG_PROC(c, f)     net->proc_map.set_proc(#c, f, proc_##c)
+//#define REG_PROC(c, f)     net->proc_map.set_proc(#c, f, proc_##c)
 
 //const std::function<size_t(std::vector<Byte>&, size_t)> &Connection::get_send_handle() const {
 //    return send_handle;

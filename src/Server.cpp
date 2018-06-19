@@ -16,6 +16,8 @@
 const int Server::LISTENQ = 5;
 const int Server::MAX_WAIT = 100;
 
+#define REG_PROC(c) proc.set_process(#c, proc_##c)
+
 Server::Server(): connection_pool(FDEvents::MAX_FDS), event(connection_pool), dbEngine(nullptr) {
     
 }
@@ -60,7 +62,7 @@ void Server::initialize(std::string ip, uint16_t port) {
     event.set(listen_fd, FDEvents::EVENT_IN, 0, nullptr);
 
     /*****************************process initialize*********************/
-    proc.set_process()
+
 }
 
 int Server::create_connection(fd_t fd, const sockaddr_in* client_addr) {
@@ -82,6 +84,10 @@ int Server::create_connection(fd_t fd, const sockaddr_in* client_addr) {
     connection_pool[fd]->initialize(fd, client_addr, Connection::FLAG_READ | Connection::FLAG_WRITE);
 
     return 0;
+}
+
+int Server::proc_initialize() {
+    REG_PROC(get);
 }
 
 int Server::destroy_connection(fd_t fd) {

@@ -18,12 +18,14 @@ public:
 
     const static int PARSE_OK = 0;
     const static int PARSE_INVALID_REQUEST = -1;
+    const static int ENCODE_OK = 0;
 
     //decode redis command from raw data
-    static int decode(const std::vector<Byte>& raw, std::vector<std::string>& production);
+    static int decode(const std::vector<Byte>& raw, Request & production);
     //encode data to net data
-    static int encode(const std::vector<std::string>& data, std::vector<Byte>& encoded);
-
+    static int encode(const Response & data, std::vector<Byte>& encoded);
+    //copy msg to net data
+    static int copy_data(const Response & data, std::vector<Byte>& encode);
     static inline bool is_end_valid(const std::vector<Byte>& data) {
         size_t len = data.size();
         return data[len - 2] == '\r' && data[len - 1] == '\n';

@@ -42,6 +42,8 @@ public:
     void serve();
     //create a new connection
     int create_connection(fd_t fd, const sockaddr_in* client_addr);
+    //initialize the process map
+    int proc_initialize();
     //destroy connection
     int destroy_connection(fd_t fd);
 };

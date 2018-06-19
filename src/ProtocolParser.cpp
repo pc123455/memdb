@@ -5,7 +5,7 @@
 #include "ProtocolParser.h"
 #include "Logger.h"
 
-int ProtocolParser::decode(const std::vector<Byte>& raw, std::vector<std::string>& production) {
+int ProtocolParser::decode(const std::vector<Byte>& raw, Request & production) {
     production.clear();
     //validate the raw data length
     size_t data_len = raw.size();
@@ -70,12 +70,18 @@ int ProtocolParser::decode(const std::vector<Byte>& raw, std::vector<std::string
     return PARSE_OK;
 }
 
-int ProtocolParser::encode(const std::vector<std::string> &data, std::vector<Byte> &encoded) {
+int ProtocolParser::encode(const Response &data, std::vector<Byte> &encoded) {
     encoded.reserve(1024);
     std::string len_str = "$" + std::to_string(data.size()) + "\r\n";
     encoded.insert(encoded.end(), len_str.begin(), len_str.end());
     for(auto it = data.begin(); it != data.end(); it++) {
         encoded.insert(encoded.end(), it->begin(), it->end());
     }
-    return 0;
+    return ENCODE_OK;
+}
+
+int ProtocolParser::copy_data(const Response &data, std::vector<Byte> &encode) {
+    encoded.reserve(1024);
+    encode.insert(encode.end(), data[0]);
+    return ENCODE_OK;
 }

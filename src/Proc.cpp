@@ -6,7 +6,11 @@
 #include "ProtocolParser.h"
 #include "utils/Error.h"
 
-int Command::operator()(DbEngine* db, std::vector<std::string>& request, std::vector<std::string>& response) {
+int Command::operator()(DbEngine* db, const Request & request, Response & response) {
+    if (request.size() < min_argc) {
+        response.push_back(Error::WRONG_ARGUMENT_NUM);
+        return Proc::PROCESS_OK;
+    }
     return proc(db, request, response);
 }
 
@@ -28,6 +32,7 @@ int Proc::process(Connection *conn, DbEngine* db) {
     auto proc_it = proc_map.find(request[0]);
     if (proc_it == proc_map.end()) {
         response.push_back(Error::INVALID_COMMAND);
+        ProtocolParser::copy_data(response, conn->get_write_buffer());
         return PROCESS_OK;
     }
 
@@ -39,12 +44,21 @@ int Proc::process(Connection *conn, DbEngine* db) {
     }
 
     //encode response and move to write buffer
-    ProtocolParser::encode(response, conn->get_write_buffer());
+    switch (res) {
+        case PROCESS_OK:
+            ProtocolParser::encode(response, conn->get_write_buffer());
+            break;
+        case PROCESS_ERROR_MSG:
+            ProtocolParser::copy_data(response, conn->get_write_buffer());
+            break;
+        default:
+            break;
+    }
+
     return PROCESS_OK;
-    //conn->set_write_buffer()
 }
 
-int Proc::set_process(const std::string& command, proc_t proc_fun) {
+int Proc::set_process(const std::string& command, proc_t proc_fun, int min_arguments) {
     auto proc_it = proc_map.find(command);
     //command exist
     if (proc_it != proc_map.end()) {
@@ -53,7 +67,7 @@ int Proc::set_process(const std::string& command, proc_t proc_fun) {
 
     std::pair<std::string, Command> p(command, Command());
 //    p.first = command;
-    p.second.initialize(command, proc_fun);
+    p.second.initialize(command, proc_fun, min_arguments);
     proc_map.insert(p);
 
     return PROCESS_OK;
