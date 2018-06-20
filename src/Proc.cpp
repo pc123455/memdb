@@ -5,6 +5,7 @@
 #include "Proc.h"
 #include "ProtocolParser.h"
 #include "utils/Error.h"
+#include "db/DbEngine.h"
 
 int Command::operator()(DbEngine* db, const Request & request, Response & response) {
     if (request.size() < min_argc) {
@@ -39,20 +40,23 @@ int Proc::process(Connection *conn, DbEngine* db) {
     //call process function to get response
     Command command = proc_it->second;
     res = command(db, request, response);
-    if(res == PROCESS_ERROR) {
+    if(res == DbEngine::DB_ERROR) {
         return PROCESS_ERROR;
     }
 
     //encode response and move to write buffer
     switch (res) {
-        case PROCESS_OK:
+        case DbEngine::DB_OK:
             ProtocolParser::encode(response, conn->get_write_buffer());
             break;
         case PROCESS_ERROR_MSG:
             ProtocolParser::copy_data(response, conn->get_write_buffer());
             break;
-        default:
+        case DbEngine::DB_NOT_FOUND:
+            ProtocolParser::copy_data(response, conn->get_write_buffer());
             break;
+        default:
+            return PROCESS_ERROR;
     }
 
     return PROCESS_OK;

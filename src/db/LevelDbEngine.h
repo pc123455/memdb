@@ -11,9 +11,12 @@
 class LevelDbEngine: public DbEngine {
     leveldb::DB* db;
     leveldb::Options options;
+    std::string data_file;
 
 public:
-    virtual int initialize();
+    int initialize() override;
+
+    int get(const std::string& key, std::string& val) override;
 
     LevelDbEngine();
 

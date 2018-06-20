@@ -12,8 +12,11 @@ class DbEngine {
 public:
     static const int DB_OK;
     static const int DB_ERROR;
+    static const int DB_NOT_FOUND;
 
     virtual int initialize();
+
+    virtual ~DbEngine(){}
 
     virtual int set(const std::string& key, const std::string& val);
 
