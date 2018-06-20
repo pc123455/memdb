@@ -12,9 +12,9 @@
 #include "db/DbEngine.h"
 #include "Connection.h"
 
-#define DEF_PROC(f) int proc_##f(DbEngine* db, const Request& request, Response& response)
+#define DEF_PROC(f) int proc_##f(DbEngine*, const Request&, Response&)
 
-using proc_t = std::function<int (DbEngine*, const Request &, Response &)>;
+using proc_t = std::function<int(DbEngine*, const Request &, Response &)>;
 
 class Command {
     static const int FLAG_READ      = (1 << 0);

@@ -13,6 +13,4 @@ public:
     static const std::string WRONG_ARGUMENT_NUM;
 };
 
-const std::string Error::INVALID_COMMAND = "-invalid commond\r\n";
-const std::string Error::WRONG_ARGUMENT_NUM = "-wrong number of arguments\r\n";
 #endif //MEMDB_ERROR_H

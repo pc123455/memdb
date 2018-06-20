@@ -16,7 +16,7 @@ int ProtocolParser::decode(const std::vector<Byte>& raw, Request & production) {
     }
 
     //validate the raw data format
-    data_const_iterator_t it = raw.begin();
+    auto it = raw.begin();
     if (*it != '*') {
         Logger::error("data is invalid");
         return PARSE_INVALID_REQUEST;
@@ -74,14 +74,14 @@ int ProtocolParser::encode(const Response &data, std::vector<Byte> &encoded) {
     encoded.reserve(1024);
     std::string len_str = "$" + std::to_string(data.size()) + "\r\n";
     encoded.insert(encoded.end(), len_str.begin(), len_str.end());
-    for(auto it = data.begin(); it != data.end(); it++) {
+    for (auto it = data.begin(); it != data.end(); it++) {
         encoded.insert(encoded.end(), it->begin(), it->end());
     }
     return ENCODE_OK;
 }
 
 int ProtocolParser::copy_data(const Response &data, std::vector<Byte> &encode) {
-    encoded.reserve(1024);
-    encode.insert(encode.end(), data[0]);
+    encode.reserve(1024);
+    encode.insert(encode.end(), data[0].begin(), data[0].end());
     return ENCODE_OK;
 }

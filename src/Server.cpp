@@ -16,7 +16,7 @@
 const int Server::LISTENQ = 5;
 const int Server::MAX_WAIT = 100;
 
-#define REG_PROC(c) proc.set_process(#c, proc_##c)
+#define REG_PROC(c,n) proc.set_process(#c, proc_##c, n)
 
 Server::Server(): connection_pool(FDEvents::MAX_FDS), event(connection_pool), dbEngine(nullptr) {
     
@@ -87,7 +87,7 @@ int Server::create_connection(fd_t fd, const sockaddr_in* client_addr) {
 }
 
 int Server::proc_initialize() {
-    REG_PROC(get);
+    REG_PROC(get, 2);
 }
 
 int Server::destroy_connection(fd_t fd) {
