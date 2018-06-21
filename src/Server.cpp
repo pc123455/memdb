@@ -88,6 +88,8 @@ int Server::create_connection(fd_t fd, const sockaddr_in* client_addr) {
 
 int Server::proc_initialize() {
     REG_PROC(get, 2);
+    REG_PROC(set, 3);
+    REG_PROC(getrange, 4);
 }
 
 int Server::destroy_connection(fd_t fd) {

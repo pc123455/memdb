@@ -58,6 +58,9 @@ public:
     int set_process(const std::string& command, proc_t proc_fun, int min_arguments);
 };
 
+/***************key-value******************/
 DEF_PROC(get);
+DEF_PROC(set);
+DEF_PROC(getrange);
 
 #endif //MEMDB_PROC_H

@@ -13,16 +13,17 @@ public:
     static const int DB_OK;
     static const int DB_ERROR;
     static const int DB_NOT_FOUND;
+    static const int DB_OUT_OF_INDEX;
 
     virtual int initialize();
 
     virtual ~DbEngine(){}
 
-    virtual int set(const std::string& key, const std::string& val);
+    virtual int set(const std::string& key, const std::string& val, std::string &response);
 
     virtual int get(const std::string& key, std::string& val);
 
-    virtual int get_range(const std::string& key, std::string& val, int start, int end);
+    virtual int getrange(const std::string& key, std::string& val, int start, int end);
 
     virtual int get_set(const std::string& key, std::string& val);
 

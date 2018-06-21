@@ -24,14 +24,3 @@ int LevelDbEngine::initialize() {
 LevelDbEngine::~LevelDbEngine() {
     delete db;
 }
-
-int LevelDbEngine::get(const std::string &key, std::string &val) {
-    leveldb::Status s = db->Get(leveldb::ReadOptions(), key, &val);
-    if (s.IsNotFound()) {
-        val = NIL_RESPONSE;
-        return DB_NOT_FOUND;
-    }
-    if (!s.ok()) {
-        return DB_OK;
-    }
-}

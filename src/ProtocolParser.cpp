@@ -72,8 +72,8 @@ int ProtocolParser::decode(const std::vector<Byte>& raw, Request & production) {
 
 int ProtocolParser::encode(const Response &data, std::vector<Byte> &encoded) {
     encoded.reserve(1024);
-    std::string len_str = "$" + std::to_string(data.size()) + "\r\n";
-    encoded.insert(encoded.end(), len_str.begin(), len_str.end());
+//    std::string len_str = "$" + std::to_string(data.size()) + "\r\n";
+//    encoded.insert(encoded.end(), len_str.begin(), len_str.end());
     for (auto it = data.begin(); it != data.end(); it++) {
         encoded.insert(encoded.end(), it->begin(), it->end());
     }
