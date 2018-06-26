@@ -10,10 +10,10 @@
 
 class DbEngine {
 public:
-    static const int DB_OK;
-    static const int DB_ERROR;
-    static const int DB_NOT_FOUND;
-    static const int DB_OUT_OF_INDEX;
+    static const int DB_OK = 0;
+    static const int DB_ERROR = -1;
+    static const int DB_NOT_FOUND = 1;
+    static const int DB_OUT_OF_INDEX = 2;
 
     virtual int initialize();
 

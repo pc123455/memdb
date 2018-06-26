@@ -46,13 +46,10 @@ int Proc::process(Connection *conn, DbEngine* db) {
 
     //encode response and move to write buffer
     switch (res) {
-        case DbEngine::DB_OK:
+        case PROCESS_OK:
             ProtocolParser::encode(response, conn->get_write_buffer());
             break;
         case PROCESS_ERROR_MSG:
-            ProtocolParser::copy_data(response, conn->get_write_buffer());
-            break;
-        case DbEngine::DB_NOT_FOUND:
             ProtocolParser::copy_data(response, conn->get_write_buffer());
             break;
         default:
