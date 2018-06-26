@@ -19,6 +19,9 @@ public:
     int get(const std::string& key, std::string& val) override;
     int set(const std::string &key, const std::string &val, std::string &response) override;
     int getrange(const std::string& key, std::string& val, int start, int end) override;
+    int getset(const std::string& key, std::string& val) override;
+    int mget(const std::vector<std::string>& keys, std::vector<std::string>& vals) override;
+    int setnx(const std::string& key, std::string& val) override;
 
     LevelDbEngine();
 

@@ -62,5 +62,8 @@ public:
 DEF_PROC(get);
 DEF_PROC(set);
 DEF_PROC(getrange);
+DEF_PROC(getset);
+DEF_PROC(mget);
+DEF_PROC(setnx);
 
 #endif //MEMDB_PROC_H

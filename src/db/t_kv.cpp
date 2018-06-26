@@ -66,3 +66,67 @@ int LevelDbEngine::getrange(const std::string &key, std::string &val, int start,
     encode(val);
     return DB_OK;
 }
+
+int LevelDbEngine::getset(const std::string &key, std::string &val) {
+    std::string str;
+    bool is_not_found = false;
+    leveldb::Status s = db->Get(leveldb::ReadOptions(), key, &str);
+    if (s.IsNotFound()) {
+        is_not_found = true;
+        str = NIL_RESPONSE;
+    }
+    if (!s.ok())
+
+    s = db->Put(leveldb::WriteOptions(), key, val);
+    if (!s.ok()) {
+        val = DB_ERROR_RESPONSE;
+        return DB_ERROR;
+    }
+
+    if (is_not_found) {
+        val = str;
+    } else {
+        encode(val);
+    }
+
+    return DB_OK;
+}
+
+int LevelDbEngine::mget(const std::vector<std::string> &keys, std::vector<std::string> &vals) {
+    std::string str;
+    for (auto it_key = keys.begin(); it_key != keys.end(); it_key++) {
+        leveldb::Status s = db->Get(leveldb::ReadOptions(), *it_key, &str);
+        if (s.IsNotFound()) {
+            vals.push_back(NIL_RESPONSE);
+        }
+        if (!s.ok()) {
+            vals.clear();
+            vals.push_back(DB_ERROR_RESPONSE);
+            return DB_ERROR;
+        }
+        encode(str);
+        vals.push_back(str);
+    }
+
+    return DB_OK;
+}
+
+int LevelDbEngine::setnx(const std::string &key, std::string &val) {
+    std::string str;
+    leveldb::Status s = db->Get(leveldb::ReadOptions(), key, &str);
+    if (!s.ok()) {
+        val = DB_ERROR_RESPONSE;
+        return DB_ERROR;
+    }
+
+    if (s.IsNotFound()) {
+        s = db->Put(leveldb::WriteOptions(), key, val);
+    }
+
+    if (!s.ok()) {
+        val = DB_ERROR_RESPONSE;
+        return DB_ERROR;
+    }
+
+    return DB_OK;
+}

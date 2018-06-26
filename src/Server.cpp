@@ -62,7 +62,7 @@ void Server::initialize(std::string ip, uint16_t port) {
     event.set(listen_fd, FDEvents::EVENT_IN, 0, nullptr);
 
     /*****************************process initialize*********************/
-
+    proc_initialize();
 }
 
 int Server::create_connection(fd_t fd, const sockaddr_in* client_addr) {
@@ -90,6 +90,10 @@ int Server::proc_initialize() {
     REG_PROC(get, 2);
     REG_PROC(set, 3);
     REG_PROC(getrange, 4);
+    REG_PROC(getset, 3);
+    REG_PROC(mget, 2);
+    REG_PROC(setnx, 3);
+    return 0;
 }
 
 int Server::destroy_connection(fd_t fd) {
