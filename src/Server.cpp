@@ -142,14 +142,18 @@ void Server::serve() {
                     switch (res) {
                         case Connection::STAGE_OK:
                             //data read complete, begin the next stage process
-                            //todo 网络数据读取完毕，开始进行下一阶段的处理
                             res = proc.process(ready_conn, dbEngine);
                             if (res == Proc::PROCESS_OK) {
                                 //after process, set the write event
                                 ready_conn->flags |= Connection::FLAG_WRITE;
                                 event.set(ready_conn->get_fd(), FDEvents::EVENT_OUT, 0, nullptr);
+                            } else {
+                                //close connection when error occur
+                                event.del(ready_conn->get_fd());
+                                ready_conn->close();
                             }
-//                            ready_conn->send();
+                            //clear the read buffer after processing
+                            ready_conn->clear_read_buffer();
                             break;
                         case Connection::STAGE_AGAIN:
                             //todo 网络数据尚未全部读取，等待新的数据
@@ -165,7 +169,7 @@ void Server::serve() {
                     switch (res) {
                         case Connection::STAGE_OK:
                             event.set(ready_conn->get_fd(), FDEvents::EVENT_IN, 0, nullptr);
-                            //if all data is sent, the write buffer will be cleared.
+                            // clear the write buffer after sending
                             ready_conn->clear_write_buffer();
                             ready_conn->flags &= ~Connection::FLAG_WRITE;
                             break;
@@ -180,5 +184,4 @@ void Server::serve() {
         }
         event.reset_ready_conncetions();
     }
-
 }

@@ -135,6 +135,8 @@ public:
     int send();
 
     fd_t get_fd();
+
+    int close();
 };
 
 

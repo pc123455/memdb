@@ -136,12 +136,17 @@ void Connection::clear_write_buffer() {
     write_cur_pos = write_buff.begin();
 }
 
-Connection::~Connection() {
+int Connection::close() {
     if (client != nullptr) {
         delete client;
         client = nullptr;
     }
     ::close(fd);
+    set_close(true);
+}
+
+Connection::~Connection() {
+    close();
 }
 
 //#define REG_PROC(c, f)     net->proc_map.set_proc(#c, f, proc_##c)

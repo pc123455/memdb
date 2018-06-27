@@ -75,7 +75,10 @@ int LevelDbEngine::getset(const std::string &key, std::string &val) {
         is_not_found = true;
         str = NIL_RESPONSE;
     }
-    if (!s.ok())
+    if (!s.ok()) {
+        val = DB_ERROR_RESPONSE;
+        return DB_ERROR;
+    }
 
     s = db->Put(leveldb::WriteOptions(), key, val);
     if (!s.ok()) {
@@ -94,7 +97,7 @@ int LevelDbEngine::getset(const std::string &key, std::string &val) {
 
 int LevelDbEngine::mget(const std::vector<std::string> &keys, std::vector<std::string> &vals) {
     std::string str;
-    for (auto it_key = keys.begin(); it_key != keys.end(); it_key++) {
+    for (auto it_key = keys.begin() + 1; it_key != keys.end(); it_key++) {
         leveldb::Status s = db->Get(leveldb::ReadOptions(), *it_key, &str);
         if (s.IsNotFound()) {
             vals.push_back(NIL_RESPONSE);
