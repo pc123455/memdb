@@ -11,7 +11,7 @@ LevelDbEngine::LevelDbEngine(): db(nullptr) {
 }
 
 int LevelDbEngine::initialize() {
-    data_file = "/home/xwy/testdb";
+    data_file = "/home/python/CLionProjects/testdb";
     options.create_if_missing = true;
     leveldb::Status status = leveldb::DB::Open(options, data_file, &db);
     if (!status.ok()) {

@@ -28,3 +28,24 @@ int proc_getrange(DbEngine* db, const Request & request, Response & response) {
     response.push_back(val);
     return result == DbEngine::DB_OK ? Proc::PROCESS_OK : Proc::PROCESS_ERROR_MSG;
 }
+
+int proc_getset(DbEngine* db, const Request & request, Response & response) {
+    std::string val;
+    val = request[1];
+    int result = db->getset(request[0], val);
+    if (result == DbEngine::DB_OK) {
+        response.push_back(val);
+    }
+    return result == DbEngine::DB_OK ? Proc::PROCESS_OK : Proc::PROCESS_ERROR_MSG;
+}
+
+int proc_mget(DbEngine* db, const Request & request, Response & response) {
+    int result = db->mget(request, response);
+    return result == DbEngine::DB_OK ? Proc::PROCESS_OK : Proc::PROCESS_ERROR_MSG;
+}
+
+int proc_setnx(DbEngine* db, const Request & request, Response & response) {
+    std::string val = request[1];
+    int result = db->setnx(request[0], val);
+    return result == DbEngine::DB_OK ? Proc::PROCESS_OK : Proc::PROCESS_ERROR_MSG;
+}

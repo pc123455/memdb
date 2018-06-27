@@ -25,7 +25,7 @@ public:
 
     LevelDbEngine();
 
-    ~LevelDbEngine();
+    ~LevelDbEngine() override ;
 };
 
 

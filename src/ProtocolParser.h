@@ -64,8 +64,8 @@ public:
         if (i < len || !validate_end_line(it, end)) {
             return -1;
         }
-        bulk_str = std::string(it - 2, end);
-        it += 2;
+        bulk_str = std::string(begin, it - 2);
+//        it += 2;
         begin = it;
         return 0;
     }
@@ -77,7 +77,7 @@ public:
      * @return
      */
     static inline bool validate_end_line(data_const_iterator_t& begin, const data_const_iterator_t& end) {
-        if (end - begin <= 2 || *begin != '\r' || *(begin + 1) == '\n') {
+        if (end - begin < 2 || *begin != '\r' || *(begin + 1) != '\n') {
             return false;
         }
         begin += 2;

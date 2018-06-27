@@ -128,5 +128,6 @@ int LevelDbEngine::setnx(const std::string &key, std::string &val) {
         return DB_ERROR;
     }
 
+    val = OK_RESPONSE;
     return DB_OK;
 }
