@@ -35,8 +35,8 @@ int Connection::initialize(fd_t fd, const sockaddr_in *client_addr, uint32_t fla
     read_buff.reserve(INITIAL_BUFFER_SIZE);
     write_buff.reserve(INITIAL_BUFFER_SIZE);
     //set read/write current pointer
-    read_cur_pos = read_buff.begin();
-    write_cur_pos = write_buff.begin();
+    read_cur_pos = 0;
+    write_cur_pos = 0;
 
 
 }
@@ -76,21 +76,16 @@ int Connection::receive() {
 }
 
 int Connection::send() {
-//    write_buff.push_back('+');
-//    write_buff.push_back('O');
-//    write_buff.push_back('K');
-//    write_buff.push_back('\r');
-//    write_buff.push_back('\n');
-
+    auto current_pos = write_buff.begin() + write_cur_pos;
     for (;;) {
-        ssize_t n = std::min<ssize_t>(write_buff.end() - write_cur_pos, buffer_size);
+        ssize_t n = std::min<ssize_t>(write_buff.end() - current_pos, buffer_size);
         if (n < 0) {
             Logger::error("write buffer pointer error");
             return STAGE_ERROR;
         } else if (n == 0) {
             return STAGE_OK;
         }
-        std::copy_n(write_cur_pos, n, buffer);
+        std::copy_n(current_pos, n, buffer);
         ssize_t res = write(fd, buffer, n);
         if (res < 0) {
             if (errno == EAGAIN) {
@@ -102,7 +97,8 @@ int Connection::send() {
         } else {
             //copy data to send buffer
             write_cur_pos += res;
-            if (write_cur_pos == write_buff.end()) {
+            current_pos = write_buff.begin() + write_cur_pos;
+            if (current_pos == write_buff.end()) {
                 return STAGE_OK;
             }
             continue;
@@ -116,7 +112,7 @@ int Connection::get_fd() {
 
 void Connection::clear_read_buffer() {
     read_buff.clear();
-    read_cur_pos = read_buff.begin();
+    read_cur_pos = 0;
 }
 
 const std::vector<Byte>& Connection::get_read_buffer() const {
@@ -133,7 +129,7 @@ int Connection::set_write_buffer(std::vector<Byte> &buff) {
 
 void Connection::clear_write_buffer() {
     write_buff.clear();
-    write_cur_pos = write_buff.begin();
+    write_cur_pos = 0;
 }
 
 int Connection::close() {

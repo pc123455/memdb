@@ -52,13 +52,13 @@ private:
     //read buffer used
     size_t read_used;
     //read buffer current position
-    std::vector<Byte>::iterator read_cur_pos;
+    size_t read_cur_pos;
     //write buffer
     std::vector<Byte> write_buff;
     //write buffer used
     size_t write_used;
     //write buffer current position
-    std::vector<Byte>::iterator write_cur_pos;
+    size_t write_cur_pos;
     //temp buffer
     Byte* buffer;
     //temp buffer size

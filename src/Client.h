@@ -14,6 +14,8 @@ class Client {
 
     //client name
     std::string name;
+    //client password
+    std::string password;
     //client flags
     uint32_t flags;
     //client input buffer
@@ -28,7 +30,13 @@ class Client {
     time_t last_interaction_time;
 
 public:
+    static int AUTHENTICATED;
+
     Client(const char* name);
+
+    bool is_authenticate();
+
+    bool authenticate(std::string pwd);
 };
 
 

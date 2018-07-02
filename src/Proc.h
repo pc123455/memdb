@@ -12,9 +12,9 @@
 #include "db/DbEngine.h"
 #include "Connection.h"
 
-#define DEF_PROC(f) int proc_##f(DbEngine*, const Request&, Response&)
+#define DEF_PROC(f) int proc_##f(Client* client, DbEngine*, const Request&, Response&)
 
-using proc_t = std::function<int(DbEngine*, const Request &, Response &)>;
+using proc_t = std::function<int(Client*, DbEngine*, const Request &, Response &)>;
 
 class Command {
     static const int FLAG_READ      = (1 << 0);
@@ -42,7 +42,7 @@ public:
     }
 
 public:
-    int operator()(DbEngine* db, const Request & request, Response & response);
+    int operator()(Client* client, DbEngine* db, const Request & request, Response & response);
 };
 
 class Proc {
@@ -58,7 +58,11 @@ public:
     int set_process(const std::string& command, proc_t proc_fun, int min_arguments);
 };
 
-/***************key-value******************/
+/**************connction****************/
+DEF_PROC(ping);
+DEF_PROC(auth);
+
+/***************string******************/
 DEF_PROC(get);
 DEF_PROC(set);
 DEF_PROC(getrange);

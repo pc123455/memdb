@@ -87,6 +87,11 @@ int Server::create_connection(fd_t fd, const sockaddr_in* client_addr) {
 }
 
 int Server::proc_initialize() {
+    /*****************connection****************/
+    REG_PROC(ping, 1);
+    REG_PROC(auth, 2);
+
+    /*****************string********************/
     REG_PROC(get, 2);
     REG_PROC(set, 3);
     REG_PROC(getrange, 4);

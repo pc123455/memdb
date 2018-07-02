@@ -7,12 +7,12 @@
 #include "utils/Error.h"
 #include "db/DbEngine.h"
 
-int Command::operator()(DbEngine* db, const Request & request, Response & response) {
+int Command::operator()(Client* client, DbEngine* db, const Request & request, Response & response) {
     if (request.size() < min_argc) {
         response.push_back(Error::WRONG_ARGUMENT_NUM);
         return Proc::PROCESS_OK;
     }
-    return proc(db, request, response);
+    return proc(client, db, request, response);
 }
 
 int Proc::process(Connection *conn, DbEngine* db) {
@@ -39,7 +39,7 @@ int Proc::process(Connection *conn, DbEngine* db) {
 
     //call process function to get response
     Command command = proc_it->second;
-    res = command(db, request, response);
+    res = command(conn->client, db, request, response);
     if(res == DbEngine::DB_ERROR) {
         return PROCESS_ERROR;
     }
