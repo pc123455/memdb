@@ -6,7 +6,11 @@
 
 int Client::AUTHENTICATED = 1;
 
-Client::Client(const char *name): name(name), flags(0), ctime(time(NULL)), auth(0) {
+Client::Client(const char *name, std::string& password): name(name),
+                                                         password(password),
+                                                         flags(0),
+                                                         ctime(time(NULL)),
+                                                         auth(0) {
     last_interaction_time = ctime;
 }
 

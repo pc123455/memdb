@@ -15,7 +15,7 @@ class Client {
     //client name
     std::string name;
     //client password
-    std::string password;
+    std::string& password;
     //client flags
     uint32_t flags;
     //client input buffer
@@ -32,7 +32,7 @@ class Client {
 public:
     static int AUTHENTICATED;
 
-    Client(const char* name);
+    Client(const char* name, std::string& password);
 
     bool is_authenticate();
 
