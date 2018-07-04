@@ -7,13 +7,20 @@
 
 
 #include <string>
+#include <unordered_map>
 
 enum LogLevel { ALL = 0, TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF};
 
 class Config {
+
+    std::unordered_map<std::string, std::string> confs;
+
+public:
+    std::string conf_path;
+
     int port;
 
-    int is_require_pass;
+    bool is_require_pass;
 
     std::string password;
 
@@ -21,6 +28,10 @@ class Config {
 
     int log_level;
 
+    static int OK;
+    static int ERROR;
+
+private:
     Config() = default;
     ~Config() = default;
     Config(const Config& conf) = default;
@@ -28,10 +39,13 @@ class Config {
 
     static Config* instance;
 
+    int load();
+
+    int read();
+
 public:
     static Config* getInstance();
 
-    static int load();
 };
 
 
