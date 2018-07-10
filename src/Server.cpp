@@ -18,13 +18,15 @@ const int Server::MAX_WAIT = 100;
 
 #define REG_PROC(c,n) proc.set_process(#c, proc_##c, n)
 
-Server::Server(): connection_pool(FDEvents::MAX_FDS), event(connection_pool), dbEngine(nullptr) {
+Server::Server(): connection_pool(FDEvents::MAX_FDS), event(connection_pool), dbEngine(nullptr), config(nullptr) {
     
 }
 
 Server::~Server() {}
 
 void Server::initialize(std::string ip, uint16_t port) {
+
+
     /**************************network initialize***********************/
     //db initialize
     dbEngine = new LevelDbEngine();

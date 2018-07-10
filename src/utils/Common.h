@@ -43,6 +43,12 @@ public:
         rtrim(s);
         return s;
     }
+
+    //upper string
+    static inline std::string& string_toupper(std::string& s) {
+        std::transform(s.begin(), s.end(), s.begin(), [](char c){ return std::toupper(c); });
+        return s;
+    }
 };
 
 

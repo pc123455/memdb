@@ -6,3 +6,4 @@
 
 const std::string Error::INVALID_COMMAND = "-invalid commond\r\n";
 const std::string Error::WRONG_ARGUMENT_NUM = "-wrong number of arguments\r\n";
+const std::string Error::UNAUTHORIZED = "-NOAUTH Authentication required\r\n";

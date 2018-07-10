@@ -12,6 +12,7 @@
 #include "Proc.h"
 #include "Event.h"
 #include "db/DbEngine.h"
+#include "config/Config.h"
 
 class Server {
     //server address structure
@@ -28,6 +29,8 @@ class Server {
     DbEngine* dbEngine;
     //process schedualer
     Proc proc;
+    //configs
+    Config* config;
 
     static const int LISTENQ;
     static const int MAX_WAIT;

@@ -64,7 +64,7 @@ private:
 public:
     std::string* operator[](const std::string& key);
 
-    static Config* getInstance();
+    static Config* get_instance();
 };
 
 

@@ -55,7 +55,7 @@ public:
 
     int process(Connection* conn, DbEngine* db);
 
-    int set_process(const std::string& command, proc_t proc_fun, int min_arguments);
+    int set_process(std::string command, proc_t proc_fun, int min_arguments);
 };
 
 /**************connction****************/

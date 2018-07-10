@@ -20,7 +20,7 @@ std::string* Config::operator[](const std::string& key) {
     return &(it->second);
 }
 
-Config* Config::getInstance() {
+Config* Config::get_instance() {
     if (instance == nullptr) {
         instance = new Config();
         instance->load();

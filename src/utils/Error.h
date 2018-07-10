@@ -11,6 +11,7 @@ class Error {
 public:
     static const std::string INVALID_COMMAND;
     static const std::string WRONG_ARGUMENT_NUM;
+    static const std::string UNAUTHORIZED;
 };
 
 #endif //MEMDB_ERROR_H

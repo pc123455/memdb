@@ -131,7 +131,8 @@ int main() {
 //    listen(listenfd, LISTENQ);
 //    do_epoll(listenfd);
     Server server;
-    server.initialize("0.0.0.0", 8888);
+    Config* config = Config::get_instance();
+    server.initialize("0.0.0.0", config->port);
     server.serve();
     return 0;
 }

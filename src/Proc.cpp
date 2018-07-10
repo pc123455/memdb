@@ -6,10 +6,17 @@
 #include "ProtocolParser.h"
 #include "utils/Error.h"
 #include "db/DbEngine.h"
+#include "config/Config.h"
+#include "utils/Common.h"
 
 int Command::operator()(Client* client, DbEngine* db, const Request & request, Response & response) {
     if (request.size() < min_argc) {
         response.push_back(Error::WRONG_ARGUMENT_NUM);
+        return Proc::PROCESS_OK;
+    }
+    Config* config = Config::get_instance();
+    if (config->is_require_pass && !client->is_authenticate() && this->name != "AUTH") {
+        response.push_back(Error::UNAUTHORIZED);
         return Proc::PROCESS_OK;
     }
     return proc(client, db, request, response);
@@ -30,7 +37,7 @@ int Proc::process(Connection *conn, DbEngine* db) {
     }
 
     //find the process function
-    auto proc_it = proc_map.find(request[0]);
+    auto proc_it = proc_map.find(Common::string_toupper(request[0]));
     if (proc_it == proc_map.end()) {
         response.push_back(Error::INVALID_COMMAND);
         ProtocolParser::copy_data(response, conn->get_write_buffer());
@@ -59,7 +66,8 @@ int Proc::process(Connection *conn, DbEngine* db) {
     return PROCESS_OK;
 }
 
-int Proc::set_process(const std::string& command, proc_t proc_fun, int min_arguments) {
+int Proc::set_process(std::string command, proc_t proc_fun, int min_arguments) {
+    Common::string_toupper(command);
     auto proc_it = proc_map.find(command);
     //command exist
     if (proc_it != proc_map.end()) {

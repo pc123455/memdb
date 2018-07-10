@@ -4,6 +4,7 @@
 #include "../Proc.h"
 #include "../utils/types.h"
 #include "../utils/response.h"
+#include "../config/Config.h"
 
 int string_encode(std::string& val) {
     std::string resp;
@@ -24,10 +25,13 @@ int proc_ping(Client* client, DbEngine* db, const Request & request, Response & 
 
 int proc_auth(Client* client, DbEngine* db, const Request & request, Response & response) {
     std::string pwd = request[1];
-    if (client->authenticate(pwd)) {
+    Config* config = Config::get_instance();
+    if (!config->is_require_pass) {
+        response.push_back(PASSWORD_UNREQUIRED);
+    } else if (client->authenticate(pwd)) {
         response.push_back(OK_RESPONSE);
     } else {
-        response.push_back(PASSWORD_WORNG);
+        response.push_back(PASSWORD_WRONG);
     }
     return Proc::PROCESS_OK;
 }
