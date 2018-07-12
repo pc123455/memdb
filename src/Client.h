@@ -25,9 +25,9 @@ class Client {
     //is client authenticated
     int auth;
     //created time
-    time_t ctime;
+    int64_t ctime;
     //last interaction time
-    time_t last_interaction_time;
+    int64_t last_interaction_time;
 
 public:
     static int AUTHENTICATED;
@@ -37,6 +37,8 @@ public:
     bool is_authenticate();
 
     bool authenticate(std::string pwd);
+
+    void refresh_time();
 };
 
 
