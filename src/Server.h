@@ -31,6 +31,8 @@ class Server {
     Proc proc;
     //configs
     Config* config;
+    //expire time map
+    std::multimap<int64_t, std::string> expire_key_map;
 
     static const int LISTENQ;
     static const int MAX_WAIT;
@@ -47,6 +49,8 @@ public:
     int create_connection(fd_t fd, const sockaddr_in* client_addr);
     //initialize the process map
     int proc_initialize();
+    //set a expire key into map
+    int set_expire_map(int64_t time, const std::string& key);
     //destroy connection
     int destroy_connection(fd_t fd);
 };

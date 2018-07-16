@@ -12,6 +12,7 @@
 #include <sys/fcntl.h>
 #include "Connection.h"
 #include "db/LevelDbEngine.h"
+#include "utils/time.h"
 
 const int Server::LISTENQ = 5;
 const int Server::MAX_WAIT = 100;
@@ -103,6 +104,11 @@ int Server::proc_initialize() {
     return 0;
 }
 
+int Server::set_expire_map(int64_t time, const std::string &key) {
+    expire_key_map.insert(std::make_pair(time, key));
+    return 0;
+}
+
 int Server::destroy_connection(fd_t fd) {
     connection_pool[fd]->release();
     return -1;
@@ -189,6 +195,18 @@ void Server::serve() {
                 }
             }
         }
+
+        int64_t time = time_ms();
+        //process expire keys
+        for(auto it = expire_key_map.begin(); it != expire_key_map.end(); it++) {
+            if (it->first <= time) {
+                //todo delete expired keys
+            } else {
+                //update the min wait time
+                break;
+            }
+        }
+
         event.reset_ready_conncetions();
     }
 }
