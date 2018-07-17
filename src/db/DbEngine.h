@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 class DbEngine {
 public:
@@ -15,14 +16,23 @@ public:
     static const int DB_NOT_FOUND = 1;
     static const int DB_OUT_OF_INDEX = 2;
 
+    //expire time map
+    std::multimap<int64_t, std::string> expire_key_map;
+
     virtual int initialize() = 0;
+
+    int add_expire_key(int64_t time, const std::string& key);
+
+    int delete_expire_keys();
+
+    int64_t get_min_expire_time();
 
     DbEngine();
 
     virtual ~DbEngine();
 
     /**key*/
-    virtual int del(const std::string& key, const std::string& val, std::string& response) = 0;
+    virtual int del(const std::string& key, std::string& response) = 0;
     virtual int expire(const std::string& key, int64_t time, std::string& response) = 0;
 
     /**string*/

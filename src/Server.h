@@ -24,18 +24,16 @@ class Server {
     //fd events
     FDEvents event;
     //timeouts set
-    std::map<time_t, Connection*> expire_time_map;
+    std::map<int64_t , Connection*> expire_time_map;
     //db engine
     DbEngine* dbEngine;
     //process schedualer
     Proc proc;
     //configs
     Config* config;
-    //expire time map
-    std::multimap<int64_t, std::string> expire_key_map;
 
     static const int LISTENQ;
-    static const int MAX_WAIT;
+    static const int64_t MAX_WAIT;
 public:
     Server();
 

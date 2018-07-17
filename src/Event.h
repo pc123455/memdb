@@ -53,7 +53,7 @@ public:
     //
     int clr(fd_t fd, int32_t flag);
     //wait for events
-    const Connection::connection_pool_t& wait(time_t timeout);
+    const Connection::connection_pool_t& wait(int timeout);
     //accept a new connection
     int accept(sockaddr_in& cliaddr, socklen_t& cliaddr_len);
     //reset the ready connection pool

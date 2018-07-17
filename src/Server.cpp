@@ -104,11 +104,6 @@ int Server::proc_initialize() {
     return 0;
 }
 
-int Server::set_expire_map(int64_t time, const std::string &key) {
-    expire_key_map.insert(std::make_pair(time, key));
-    return 0;
-}
-
 int Server::destroy_connection(fd_t fd) {
     connection_pool[fd]->release();
     return -1;
@@ -116,14 +111,26 @@ int Server::destroy_connection(fd_t fd) {
 
 void Server::serve() {
     for (;;) {
+        //process expired keys
+        dbEngine->delete_expire_keys();
+        int64_t min_expire_time = dbEngine->get_min_expire_time();
+        int64_t interval_time = 0;
+        if (min_expire_time < 0) {
+            interval_time = MAX_WAIT;
+        } else {
+            interval_time = std::max<int64_t>(min_expire_time - time_ms(), 0);
+        }
+        int64_t wait_time = std::min(MAX_WAIT, interval_time);
+
+        //todo process expired connections
         auto expire_it = expire_time_map.begin();
-        time_t wait_time = expire_it == expire_time_map.end() ? MAX_WAIT : expire_it->first - time(NULL);
-        wait_time = std::max<time_t>(wait_time, 0);
+        wait_time = expire_it == expire_time_map.end() ? MAX_WAIT : expire_it->first - time_ms();
+        wait_time = std::max<int64_t>(wait_time, 0);
 
         const Connection::connection_pool_t& ready_connections = event.wait(wait_time);
 
         //process timeouts connections
-        time_t cur_time = time(NULL);
+        time_t cur_time = time_ms();
         for (expire_it = expire_time_map.begin(); expire_it != expire_time_map.end(); expire_it++) {
             if (expire_it->first > cur_time) {
                 break;
@@ -193,17 +200,6 @@ void Server::serve() {
                             break;
                     }
                 }
-            }
-        }
-
-        int64_t time = time_ms();
-        //process expire keys
-        for(auto it = expire_key_map.begin(); it != expire_key_map.end(); it++) {
-            if (it->first <= time) {
-                //todo delete expired keys
-            } else {
-                //update the min wait time
-                break;
             }
         }
 

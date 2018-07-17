@@ -6,6 +6,8 @@
 #include "DataType.h"
 #include "constant.h"
 
+
+
 inline std::string encode_expire_key(const std::string key) {
     std::string exp_key;
     //2 = length(type) + length('\0')
@@ -13,6 +15,10 @@ inline std::string encode_expire_key(const std::string key) {
     exp_key.append(1, DataType::EXPIRE);
     exp_key.append(key);
     return exp_key;
+}
+
+int LevelDbEngine::del(const std::string &key, std::string &response) {
+
 }
 
 int LevelDbEngine::expire(const std::string& key, int64_t time, std::string& response) {

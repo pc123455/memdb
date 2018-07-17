@@ -16,7 +16,8 @@ class LevelDbEngine: public DbEngine {
 public:
     int initialize() override;
 
-    int int expire(const std::string& key, int64_t time, std::string& response) override;
+    int del(const std::string& key, std::string& response) override;
+    int expire(const std::string& key, int64_t time, std::string& response) override;
 
     int get(const std::string& key, std::string& val) override;
     int set(const std::string &key, const std::string &val, std::string &response) override;
