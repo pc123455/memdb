@@ -24,7 +24,7 @@ class Server {
     //fd events
     FDEvents event;
     //timeouts set
-    std::map<int64_t , Connection*> expire_time_map;
+    std::map<int64_t , Connection*> connection_expire_time_map;
     //db engine
     DbEngine* dbEngine;
     //process schedualer

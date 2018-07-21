@@ -110,7 +110,9 @@ int Server::destroy_connection(fd_t fd) {
 }
 
 void Server::serve() {
-    for (;;) {
+    //todo 避免ide死循环报警 暂时这样
+    bool f = true;
+    for (;f;) {
         //process expired keys
         dbEngine->delete_expire_keys();
         int64_t min_expire_time = dbEngine->get_min_expire_time();
@@ -123,15 +125,16 @@ void Server::serve() {
         int64_t wait_time = std::min(MAX_WAIT, interval_time);
 
         //todo process expired connections
-        auto expire_it = expire_time_map.begin();
-        wait_time = expire_it == expire_time_map.end() ? MAX_WAIT : expire_it->first - time_ms();
-        wait_time = std::max<int64_t>(wait_time, 0);
+        auto expire_it = connection_expire_time_map.begin();
+        int64_t conn_expire_time = expire_it == connection_expire_time_map.end() ? MAX_WAIT : expire_it->first - time_ms();
+        conn_expire_time = std::min(conn_expire_time, 0ll);
+        wait_time = std::min(conn_expire_time, wait_time);
 
         const Connection::connection_pool_t& ready_connections = event.wait(wait_time);
 
         //process timeouts connections
         time_t cur_time = time_ms();
-        for (expire_it = expire_time_map.begin(); expire_it != expire_time_map.end(); expire_it++) {
+        for (expire_it = connection_expire_time_map.begin(); expire_it != connection_expire_time_map.end(); expire_it++) {
             if (expire_it->first > cur_time) {
                 break;
             }

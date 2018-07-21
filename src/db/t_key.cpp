@@ -5,6 +5,7 @@
 #include "LevelDbEngine.h"
 #include "DataType.h"
 #include "constant.h"
+#include "t_string.h"
 
 
 
@@ -18,7 +19,17 @@ inline std::string encode_expire_key(const std::string key) {
 }
 
 int LevelDbEngine::del(const std::string &key, std::string &response) {
-
+    //del string key
+    std::string string_key = encode_string_key(key);
+    leveldb::Status s = db->Delete(leveldb::WriteOptions(), string_key);
+    if (!s.ok()) {
+        if (!s.IsNotFound()) {
+            return DB_ERROR;
+        }
+    } else {
+        response = OK_RESPONSE;
+        return DB_OK;
+    }
 }
 
 int LevelDbEngine::expire(const std::string& key, int64_t time, std::string& response) {

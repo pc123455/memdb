@@ -5,21 +5,13 @@
 #include "LevelDbEngine.h"
 #include "constant.h"
 #include "DataType.h"
+#include "t_string.h"
 
 int encode(std::string& val) {
     std::string resp;
     resp = "$" + std::to_string(val.length()) + "\r\n" + val + "\r\n";
     val = resp;
     return LevelDbEngine::DB_OK;
-}
-
-std::string encode_string_key(const std::string& key) {
-    std::string str_key;
-    //2 = length(type) + length('\0')
-    str_key.reserve(key.size() + 2);
-    str_key.append(1, DataType::STRING);
-    str_key.append(key.c_str(), key.size());
-    return str_key;
 }
 
 int LevelDbEngine::get(const std::string &key, std::string &val) {
@@ -56,6 +48,7 @@ int LevelDbEngine::getrange(const std::string &key, std::string &val, int start,
     leveldb::Status s = db->Get(leveldb::ReadOptions(), new_key, &str);
     if (s.IsNotFound()) {
         val = NIL_RESPONSE;
+        return DB_OK;
     }
     if (!s.ok()) {
         val = DB_ERROR_RESPONSE;
@@ -88,8 +81,8 @@ int LevelDbEngine::getset(const std::string &key, std::string &val) {
     bool is_not_found = false;
     leveldb::Status s = db->Get(leveldb::ReadOptions(), new_key, &str);
     if (s.IsNotFound()) {
-        is_not_found = true;
         str = NIL_RESPONSE;
+        return DB_OK;
     }
     if (!s.ok()) {
         val = DB_ERROR_RESPONSE;
@@ -102,12 +95,7 @@ int LevelDbEngine::getset(const std::string &key, std::string &val) {
         return DB_ERROR;
     }
 
-    if (is_not_found) {
-        val = str;
-    } else {
-        encode(val);
-    }
-
+    encode(val);
     return DB_OK;
 }
 
@@ -119,7 +107,7 @@ int LevelDbEngine::mget(const std::vector<std::string> &keys, std::vector<std::s
         if (s.IsNotFound()) {
             vals.push_back(NIL_RESPONSE);
         }
-        if (!s.ok()) {
+        if (!s.ok() && !s.IsNotFound()) {
             vals.clear();
             vals.push_back(DB_ERROR_RESPONSE);
             return DB_ERROR;
@@ -135,7 +123,7 @@ int LevelDbEngine::setnx(const std::string &key, std::string &val) {
     std::string str;
     std::string new_key = encode_string_key(key);
     leveldb::Status s = db->Get(leveldb::ReadOptions(), new_key, &str);
-    if (!s.ok()) {
+    if (!s.ok() && !s.IsNotFound()) {
         val = DB_ERROR_RESPONSE;
         return DB_ERROR;
     }

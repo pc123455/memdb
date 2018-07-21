@@ -81,7 +81,7 @@ int FDEvents::accept(sockaddr_in& cliaddr, socklen_t& cliaddr_len) {
     return clifd;
 }
 
-const Connection::connection_pool_t& FDEvents::wait(int timeout) {
+const Connection::connection_pool_t& FDEvents::wait(int64_t timeout) {
     ready_connections.clear();
     int ret = epoll_wait(epollfd, epoll_events, EPOLL_EVENTS, timeout);
     if (ret > 0) {
