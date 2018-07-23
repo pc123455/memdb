@@ -58,6 +58,10 @@ public:
     int set_process(std::string command, proc_t proc_fun, int min_arguments);
 };
 
+/****************key********************/
+DEF_PROC(del);
+DEF_PROC(expire);
+
 /**************connction****************/
 DEF_PROC(ping);
 DEF_PROC(auth);

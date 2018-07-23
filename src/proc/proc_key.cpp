@@ -10,7 +10,9 @@
 
 
 int proc_del(Client* client, DbEngine* db, const Request & request, Response & response) {
-    return Proc::PROCESS_OK;
+    std::string resp;
+    int result = db->del(request[1], resp);
+    return result == DbEngine::DB_OK ? Proc::PROCESS_OK : Proc::PROCESS_ERROR_MSG;
 }
 
 int proc_expire(Client* client, DbEngine* db, const Request & request, Response & response) {

@@ -90,6 +90,10 @@ int Server::create_connection(fd_t fd, const sockaddr_in* client_addr) {
 }
 
 int Server::proc_initialize() {
+    /****************key********************/
+    REG_PROC(del, 1);
+    REG_PROC(expire, 2);
+
     /*****************connection****************/
     REG_PROC(ping, 1);
     REG_PROC(auth, 2);
